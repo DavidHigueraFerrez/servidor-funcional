@@ -1,0 +1,61 @@
+<div class="row row-grid"></div>
+<div class="row row-grid center">   
+        <table>
+                <tr>
+                        <td class="col-md-2"><label>Nombre Asignatura</label></td>
+                        <td class="col-md-2"><label>Codigo Asignatura</label></td>
+                        <td class="col-md-2"><label>Profesor Presidente</label></td>
+                        <td class="col-md-2"><label>Profesor Vocal</label></td>
+                        <td class="col-md-2"><label>Profesor Secretario</label></td>
+                        <td class="col-md-3"><label>Departamento Responsable</label></td>
+                </tr>
+                <tr>
+                        <td class="col-md-2"><input type="text" id="name" /></td>
+                        <td class="col-md-2"><input type="text" id="name" /></td>
+                        <td class="col-md-2"><input type="text" id="name" /></td>
+                        <td class="col-md-2"><input type="text" id="name" /></td>
+                        <td class="col-md-2"><input type="text" id="name" /></td>
+                        <td class="col-md-2"><input type="text" id="name" /></td>
+                </tr>
+                
+        </table>
+
+</div> 
+
+<div class="row row-grid center"> 
+        
+       
+        <p class="col-md-2"></p>
+        <button class="col-md-2 centered" type="submit" id="btn1">Añadir tribunales</button>  
+        <p class="col-md-7"></p>    
+        <button class="col-md-1 centered" type="submit">Enviar</button>
+</div>
+<script>
+$(document).ready(function(){
+        $("#btn2").click(function(){
+                $("p").append(" <b>Appended text</b>.");
+        });
+        $("#btn1").click(function(){
+                $("table").append(
+                        '<tr>',
+                                '<td class="col-md-2"><label>Nombre Asignatura</label></td>',
+                                '<td class="col-md-2"><label>Codigo Asignatura</label></td>',
+                                '<td class="col-md-2"><label>Profesor Presidente</label></td>',
+                                '<td class="col-md-2"><label>Profesor Vocal</label></td>',
+                                '<td class="col-md-2"><label>Profesor Secretario</label></td>',
+                                '<td class="col-md-3"><label>Departamento Responsable</label></td>',
+                        '<tr>',
+                        '<tr>',
+                                '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                '<td class="col-md-2"><button class="borrar centered" type="submit" id="btn2">borrar</button></td>',
+                        '</tr>'
+                        );
+        });
+
+});
+</script>

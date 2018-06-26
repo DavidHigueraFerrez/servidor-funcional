@@ -1,0 +1,86 @@
+<!-- Local -->
+<!-- <script src="/js/autocomplete.js"></script> -->
+<!-- despliegue -->
+<script src="/progdoc/js/autocomplete.js"></script> 
+<%- include cumplimentar.ejs %>
+<div>
+<form autocomplete="off" action="<%= nuevopath %>" method="post" >
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Presidente</th>
+      <th scope="col">Vocal</th>
+      <th scope="col">Secretario</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for(var i=0; i < tribunales.length; i++) { %>
+    <tr>
+      <th scope="row"><%= tribunales[i].acronimo%></th>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Presidente')">
+      <% if(tribunales[i].presidenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
+      <input id='tribunal_<%=tribunales[i].tribunalId%>_Presidente' type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%= tribunales[i].presidenteNombre %>_Presidente" placeholder="<%= tribunales[i].presidenteNombre %>" >
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>-</p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Presidente" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %> 
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Vocal' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Vocal')">
+      <% if(tribunales[i].vocalNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'><%= tribunales[i].vocalNombre%></p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%= tribunales[i].vocalNombre %>_Vocal" placeholder="<%= tribunales[i].vocalNombre %>" >
+      <% } else{ %>
+       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>-</p>
+        <input id="tribunal_<%=tribunales[i].tribunalId%>_Vocal" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Secretario' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Secretario')">
+      <% if(tribunales[i].secretarioNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" value="<%=tribunales[i].tribunalId%>_<%=tribunales[i].secretarioNombre %>_Secretario" placeholder="<%= tribunales[i].secretarioNombre %>" >
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <input id="tribunal_<%=tribunales[i].tribunalId%>_Secretario" type="hidden" name="noCambio" placeholder="Seleccione profesor" >
+      <% } %>
+      </td>
+    </tr>
+<% } %> 
+  </tbody>
+</table>
+<input type="submit" value='Guardar'>
+<button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+</form>
+<script>
+let profesores = <%-JSON.stringify(profesores)%>
+let profesores2 = quitAcents(profesores)
+function mostrar(id){
+  let celda = document.getElementById("td_"+id);
+  //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
+  let p = document.getElementById("p_"+id);
+  let p2 = document.getElementById("p_"+id+"_provisional")
+  let input = document.getElementById(id)
+  let nameInput = input.getAttribute('name');
+  if (p){
+    //creo el div para encapsular la busqueda
+    let div = document.createElement('div');
+    div.innerHTML = '<div class="autocomplete" style="width:500px;"></div>'
+    let nuevo = div.firstChild;
+    celda.appendChild(nuevo)
+    nuevo.appendChild(input)
+    celda.removeChild(p);
+    let nuevoValor = input.getAttribute('placeholder')
+    if (input.getAttribute('value')){
+      input.setAttribute('value', nuevoValor )
+    }
+    input.setAttribute('type', 'text')
+    autocomplete(input, profesores, profesores2, 'tribunales');
+  }else if(p2){
+    p2.setAttribute('id', "p_"+id);
+  }
+}
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+</script>

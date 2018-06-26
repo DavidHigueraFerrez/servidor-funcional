@@ -1,0 +1,89 @@
+<!-- Local -->
+<!-- <script src="/js/autocomplete.js"></script>-->
+<!-- despliegue -->
+ <script src="/progdoc/js/autocomplete.js"></script>
+<%- include cumplimentar.ejs %>
+<div>
+<ul style="list-style-type:none">
+<% for(var i=0; i < asignacion.length; i++) { %> 
+  <% if(i===0) { %>
+    <li>
+    <h2>Curso <%= asignacion[i].curso %></h2>
+   <% } %>
+  <% if(i>=1 && asignacion[i].curso !== asignacion[i-1].curso) { %>
+  </li>
+  <li>
+    <h2>Curso <%= asignacion[i].curso %></h2>
+    <% } %>
+    <ul style="list-style-type:none">
+      <li>
+     <% if(estadoProfesores === 0) { %>
+      <form action="<%= nuevopath %>" method="get">
+      <input type="hidden", name = 'acronimo', value='<%= asignacion[i].acronimo %>'>
+      <input type="hidden", name = 'pdID', value='<%= pdID %>'>
+      <input type="hidden", name = 'departamentoID', value='<%= departamentoID %>'>
+    <h3> <%= asignacion[i].acronimo %> <input type="submit" value="Editar"></h3>
+      </form>
+      <% } else{%>
+      <h3> <%= asignacion[i].acronimo %></h3>
+      <% }%>
+       <ul style="list-style-type:none">
+       <li>
+         <span> Coordinador: <%= asignacion[i].coordinador.nombre %> </span>
+       </li>
+    <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
+     
+        <li>
+      <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %>: </span>
+      <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){ %>
+      <span><%= asignacion[i].grupos[j].profesors[k].nombre %>;</span>
+    <% } %>
+        </li>
+  <% } %> 
+    </ul>
+    </li>
+ </ul>  
+<% } %>
+</li>
+</ul>
+</div>
+<% if(estadoProfesores === 0) { %>
+<form action="<%= aprobarpath %>" method="get" onsubmit="return Enviar()">
+<input type="hidden" name="pdID" value='<%= pdID %>'>
+<input type="hidden" name='estadoProfesores' value= '<%= estadoProfesores %>'>
+<input type='submit' value='Aprobar Asignación Profesores'>
+</form>
+<% } %>
+<% if(estadoProfesores === 1) { %>
+<form id="formDecision" action="<%= aprobarpath %>" method="get">
+<input type="hidden" name="pdID" value='<%= pdID %>'>
+<input id="decision" type="hidden" name="decision" value='aceptar'>
+<input type="hidden" name='estadoProfesores' value= '<%= estadoProfesores %>'>
+<button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Profesores</button>
+<button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Profesores</button>
+</form>
+<% } %>
+<script>
+
+let profesores = <%-JSON.stringify(profesores)%>
+//console.log('aaaaa')
+//console.log(profesores)
+let profesores2 = quitAcents(profesores)
+//document.getElementsByTagName('body')[0].onload = changeSelect();
+
+function Enviar(){
+  return confirm("Una vez aprobada la asignación de profesores no podrá modificarla a menos que... ¿Seguro que quiere aprobarla?")
+}
+
+function Decidir(decision){
+  let dec = document.getElementById('decision');
+  dec.setAttribute('value', decision)
+  if(confirm("Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?")){
+    document.getElementById("formDecision").submit();
+  }
+  
+}
+</script>
+
+
+    

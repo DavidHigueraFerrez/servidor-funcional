@@ -1,0 +1,82 @@
+<!-- Local -->
+<!-- <script src="/js/autocomplete.js"></script> -->
+<!-- despliegue -->
+<script src="/progdoc/js/autocomplete.js"></script>
+<div>
+<form autocomplete="off" action="<%= nuevopath %>" method="post" >
+<input type="hidden" name="asignaturaId" value="<%= asign.identificador %>">
+<input type="hidden" name="pdID" value="<%= pdID %>">
+
+<h1><%= asign.acronimo %></h1>
+<ul style="list-style-type:none">
+    <li>Coordinador:
+    <div class="autocomplete" style="width:500px;">
+    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombre %>" placeholder="<%= asign.coordinador.nombre %>">
+    </div> 
+    </li>
+    <% for(var i=0; i< asign.grupos.length; i++){ %>
+        <li>
+      <h2> Grupo <%= asign.grupos[i].GrupoNombre %>: </h2>
+      <ul style="list-style-type:none">
+      <%for(var j=0; j< asign.grupos[i].profesors.length; j++){ %>
+      <li id="asignacion_<%= asign.grupos[i].profesors[j].asignacion %>">
+      <%= asign.grupos[i].profesors[j].nombre %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
+      </li>
+    <% } %>
+    <div id = 'anadir_profesor_<%= asign.grupos[i].GrupoId %>'></div>
+    <button type="button" onclick="AnadirProfesor('anadir_profesor_<%= asign.grupos[i].GrupoId %>')">Añadir Profesor</button>
+        </ul>
+        </li>
+  <% } %> 
+    </ul>
+    <input type='submit' value='Guardar'>
+    <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+</form> 
+</div>
+
+
+<script>
+let numeroIncrementable = 0;
+let profesores = <%- JSON.stringify(profesores) %>
+//console.log('aaaaa')
+//console.log(profesores)
+let profesores2 = quitAcents(profesores)
+
+autocomplete(document.getElementById("coordinador"), profesores, profesores2);
+
+function Eliminar(id) {
+   document.getElementById(id).innerHTML = '<input name="eliminar" id="momentaneo" type="hidden" value="">'
+   let memomentaneo = document.getElementById(momentaneo)
+   momentaneo.setAttribute('value', "eliminar_"+id) 
+   momentaneo.setAttribute('id', "") 
+}
+
+function Eliminar2(id){
+  let input = document.getElementById(id);
+  let liste = document.getElementById("list_"+id);
+  input.parentNode.removeChild(input);
+  liste.parentNode.removeChild(liste);
+  
+}
+
+function AnadirProfesor(id){
+ var div = document.createElement('div');
+  div.innerHTML = '<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="vacio" value="" placeholder="Seleccionar Profesor"></div>'
+  let node = div.firstChild;
+  /*No se puede usar innerHtml directamente pq si añades varios buscadores en un mismo grupo desaparece la funcionalidad de los primeros
+  buscadores. Con javascript debes crear primero un elemento, la forma más sencislla para hacerlo con un string es esa
+  Alternativaemtne se podría hacer con jquery así
+  */
+  //$( "#"+id ).append('<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="anadir" value="" placeholder="Seleccionar Profesor"></div> ' ); 
+  document.getElementById(id).appendChild(node);
+  let memomentaneo = document.getElementById(momentaneo)
+   console.log(numeroIncrementable)
+   momentaneo.setAttribute('id', numeroIncrementable)
+   autocomplete(document.getElementById(numeroIncrementable), profesores, profesores2, 'asignacionProfesores');
+   numeroIncrementable++; 
+}
+
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+</script>

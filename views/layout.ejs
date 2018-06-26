@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8"> 
+  <!-- Despliegue -->
+   <link rel='stylesheet' type="text/css" href='/progdoc/stylesheets/style.css' /> 
+  <!-- Local -->
+  <!-- <link rel='stylesheet' href='../stylesheets/style.css' /> --> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <title>Portal del Profesor</title>
+</head>
+<body>
+  <div class="sidenav">
+  <h2> Portal Profesor </h2>
+  <button id='drop_ProgDoc' class="dropdown-btn">Programación Docente 
+     <i class="glyphicon glyphicon-plus fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-container">
+    <a id='element_ProgDocConsulta' href="/progdoc/Consulta">Consulta</a>
+    <a id='element_ProgDocCumplimentar' href="/progdoc/Cumplimentar">Cumplimentar</a>
+    <a id='element_ProgDocGestion' href="/progdoc/Gestion">Gestion</a>
+    <a id='element_ProgDocHistorial' href="/progdoc/Historial">Historial</a>
+     <!--<a href="/progdoc/AsignarHorariosExamenes">Horarios Exámenes</a>
+    <a href="/progdoc/AsignarHorariosGrupos">Horarios Grupos</a>
+    <a href="/progdoc/AprobarProgramacion">Aprobar Programación</a>
+    <a href="/progdoc/Historial">Programaciones cursos anteriores</a>-->
+  </div>
+  
+  <a href="#">Futura Aplicación 1</a>
+  <a href="#">Futura Aplicación 2</a>
+</div>
+<% if (locals.menu) { %>
+    <% for(var i=0; i< menu.length; i++){ %>
+      <input type="hidden" name="menu" value="<%=menu[i]%>">
+    <% }%>
+
+  <%} else {%>
+    <input type="hidden" name="menu">
+  <%}%>
+
+<div class="main">
+  <a href="/progdoc/logout"><button class="btn pull-right">Cerrar Sesion</button></a>
+  <%- body %>
+</div>
+<script>
+/* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+let dropdown = document.getElementsByClassName("dropdown-btn");
+let i;
+
+for (i = 0; i < dropdown.length; i++) {
+  dropdown[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    $(this).find('i').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+    let dropdownContent = this.nextElementSibling;
+    if (dropdownContent.style.display === "block") {
+      dropdownContent.style.display = "none";
+    } else {
+      dropdownContent.style.display = "block";
+    }
+  });
+} 
+
+document.getElementsByTagName('body')[0].onload = actualizarMenu();
+function actualizarMenu(){
+let menu = document.getElementsByName("menu");
+menu.forEach(function(element,index){
+  if (element.value === ""){
+    return
+  }else{
+    if (element.value.split("_")[0] === "drop"){
+      let el = document.getElementById(element.value)
+      el.className += " active";
+      $(el).find('i').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+      let dropdownContent = el.nextElementSibling;
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+      }
+    }if (element.value.split("_")[0] === "element"){
+      let el = document.getElementById(element.value)
+      el.className += " activeMenu";
+    }
+
+  }
+  });
+}
+
+</script>
+
+</body>
+</html>

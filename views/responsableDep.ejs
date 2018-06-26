@@ -1,0 +1,148 @@
+<h1>Bienvenido responsable departamento</h1>
+
+    <% asignaciones.forEach(function(asignacion) { %>
+        <h1><%= asignacion.asignatura.identificador %></h1>
+            <ul>
+                <% asignacion.profesores.forEach(function(profesor){%>
+                    <li><%= profesor %></li>
+                <% }); %>
+            </ul>
+    <% }); %>
+
+<!-- 
+<div class="row row-grid"></div>
+<div class="row row-grid center col-md-11">
+    <h2>Asignaturas </h2> 
+        <table>
+            <tbody id="mytablebody">
+                <tr>
+                    <td class="col-md-2"><label> Nombre</label></td>
+                    <td class="col-md-2"><label>Acronimo</label></td>
+                    <td class="col-md-2"><label>Codigo Asignatura</label></td>
+                    <td class="col-md-2"><label>Creditos</label></td>
+                    <td class="col-md-2"><label>Coordinador</label></td>
+                    <td class="col-md-2"><label>Departamento Responsable</label></td>
+                </tr>
+                <tr>
+                    <td class="col-md-2"><input type="text" id="name" /></td>
+                    <td class="col-md-2"><input type="text" id="name" /></td>
+                    <td class="col-md-2"><input type="text" id="name" /></td>
+                    <td class="col-md-2"><input type="text" id="name" /></td>
+                    <td class="col-md-2"><input type="text" id="name" /></td>
+                    <td class="col-md-2"><input type="text" id="name" /></td>
+                </tr>
+                <tr>
+                    <table>
+                        <tr>
+                            <td class="col-md-1"></td>
+                            <td class="col-md-1"></td>
+                            <td class="col-md-2"><label>Nombre</label></td>
+                            <td class="col-md-2"><label>Apellidos</label></td>
+                            <td class="col-md-2"><label>Departamento</label></td>
+                            <td class="col-md-1"></td>
+                            
+
+                        </tr>
+                        <tr>
+                            <td class="col-md-1"></td>
+                            <td class="col-md-1">Profesor 1</td>
+                            <td class="col-md-2"><input type="text" id="name" /></td>
+                            <td class="col-md-2"><input type="text" id="name" /></td>
+                            <td class="col-md-2"><input type="text" id="name" /></td>
+                            <td class="col-md-2"></td>
+                        </tr>
+                        <tr>
+                                <td class="col-md-1"></td>
+                                <td class="col-md-1"></td>
+                                <td class="col-md-2"><label>Nombre</label></td>
+                                <td class="col-md-2"><label>Apellidos</label></td>
+                                <td class="col-md-2"><label>Departamento</label></td>
+                        </tr>
+                        <tr>
+                                <td class="col-md-1"></td>
+                                <td class="col-md-1">Profesor 2</td>
+                                <td class="col-md-2"><input type="text" id="name" /></td>
+                                <td class="col-md-2"><input type="text" id="name" /></td>
+                                <td class="col-md-2"><input type="text" id="name" /></td>
+                        </tr>
+                    </table>      
+                </tr>
+            </tbody>
+        </table>
+</div> 
+
+<div class="row row-grid center"> 
+        <p class="col-md-2"></p>
+        <button class="col-md-2 centered" type="submit" id="btn1">Añadir Asignatura</button>  
+        <p class="col-md-7"></p>    
+        <button class="col-md-1 centered" type="submit">Enviar</button>
+</div>
+<script>
+        $(document).ready(function(){
+                $("#btn2").click(function(){
+                    $(this).remove();
+                });
+                $("#btn1").click(function(){
+                    let numero=1;
+                        $("table tbody:last").append(
+                                '<tr class="numero">',
+                                        '<td class="col-md-2"><label> Nombre</label></td>',
+                                        '<td class="col-md-2"><label>Acronimo</label></td>',
+                                        '<td class="col-md-2"><label>Codigo Asignatura</label></td>',
+                                        '<td class="col-md-2"><label>Creditos</label></td>',
+                                        '<td class="col-md-2"><label>Coordinador</label></td>',
+                                        '<td class="col-md-3"><label>Departamento Responsable</label></td>',
+                                        
+                                '<tr>',
+                                '<tr class="numero">',
+                                        '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '<td class="col-md-2"><button class="borrar centered" type="submit" id="btn2">borrar</button></td>',
+                                '</tr>',
+                                '<table class="numero">',
+                                        '<tr>',
+                                            '<td class="col-md-1"></td>',
+                                            '<td class="col-md-1"></td>',
+                                            '<td class="col-md-2"><label>Nombre</label></td>',
+                                            '<td class="col-md-2"><label>Apellidos</label></td>',
+                                            '<td class="col-md-2"><label>Departamento</label></td>',
+                                            '<td class="col-md-1"></td>',
+                            
+
+                                        '</tr>',
+                                        '<tr>',
+                                            '<td class="col-md-1"></td>',
+                                            '<td class="col-md-1">Profesor 1</td>',
+                                            '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                            '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                            '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                            '<td class="col-md-2"></td>',
+                                        '</tr>',
+                                        '<tr>',
+                                            '<td class="col-md-1"></td>',
+                                            '<td class="col-md-1"></td>',
+                                            '<td class="col-md-2"><label>Nombre</label></td>',
+                                            '<td class="col-md-2"><label>Apellidos</label></td>',
+                                            '<td class="col-md-2"><label>Departamento</label></td>',
+                                        '</tr>',
+                                        '<tr>',
+                                            '<td class="col-md-1"></td>',
+                                            '<td class="col-md-1">Profesor 2</td>',
+                                            '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                            '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                            '<td class="col-md-2"><input type="text" id="name" /></td>',
+                                        '</tr>',
+                                '</table>'
+                        );
+                        numero=numero+1;
+                });
+        
+        });
+        </script>
+
+-->
+

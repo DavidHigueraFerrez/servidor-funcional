@@ -1,0 +1,214 @@
+html{
+height: 100%;
+}
+
+body, html {
+font: 15px/1.5em Arial,Helvetica,sans-serif !important;
+background-color: inherit !important;
+}
+body{
+
+
+}
+
+h1, h2, h3, h4, h5, h6{
+    font: bold 11px;
+    margin: 0 0 10 px;
+}
+
+a {
+    color: #f5f5f5 !important;
+    text-decoration: none;
+}
+p{
+    display: block;
+    -webkit-margin-before: 0em !important;
+    -webkit-margin-after: 0em !important;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+.container_login{
+    margin-top: 150px;
+    
+}
+
+
+.login_box{
+    background:#f7f7f7;
+    border:3px solid #F4F4F4;
+    padding-left: 15px;
+    margin-bottom:25px;
+    }
+.input_title{
+    color:rgba(164, 164, 164, 0.9);
+    padding-left:3px;
+        margin-bottom: 2px;
+    }
+
+hr{
+    width:100%;
+}
+    
+.title{
+    font-family: "myriad-pro",sans-serif;
+    font-style: normal;
+    font-weight: 100;
+    color:#FFFFFF;
+    margin-bottom:25px;
+    margin-top:50px;
+
+}
+
+.login_title{
+    font-size: 25px;
+    color:rgba(242, 166, 34, 1);
+}
+
+.login_subtitle{
+    font-size: 15px;
+    color:rgba(164, 164, 164, 0.90);
+}
+
+.card-container.card {
+    
+    max-width: 350px;
+    background-image: url("../images/fotoUPM.png");
+    background-repeat: no-repeat;
+    background-position: right bottom;
+}
+
+
+.btn {
+    font-weight: 700;
+    height: 36px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    border-radius:0;
+    background:#43A6EB;
+    height: 55px;
+    margin-bottom:10px;
+}
+
+.btn-login{
+    background-color: #e07812 !important;
+    border-color: #8a5603;
+}
+
+.btn-login:hover{
+background-color: #d06d0b !important;
+    border-color: #8a5603 !important;
+}
+
+.btn-login:active{
+ background-color: #e07812 !important;
+border-color: #8a5603;
+}
+
+/*
+ * Card component
+ */
+.card {
+   
+    /* just in case there no content*/
+    padding: 1px 25px 30px;
+    margin: 0 auto 25px;
+    margin-top: 15%x;
+    background-color: #4b6582 !important;
+    /* shadows and rounded borders */
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.profile-img-card {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 10px;
+    display: block;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
+
+/*
+ * Form styles
+ */
+.profile-name-card {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0 0;
+    min-height: 1em;
+}
+
+.reauth-email {
+    display: block;
+    color: #404040;
+    line-height: 2;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.form-signin #inputEmail,
+.form-signin #inputPassword {
+    direction: ltr;
+    height: 44px;
+    font-size: 16px;
+}
+
+.form-signin input[type=email],
+.form-signin input[type=password],
+.form-signin input[type=text],
+.form-signin button {
+    width: 100%;
+    display: block;
+
+    z-index: 1;
+    position: relative;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.form-signin .form-control:focus {
+    border-color: rgb(104, 145, 162);
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(104, 145, 162);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(104, 145, 162);
+}
+
+.btn.btn-signin {
+    /*background-color: #4d90fe; */
+    background-color: rgb(104, 145, 162);
+    /* background-color: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));*/
+    padding: 0px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
+
+.btn.btn-signin:hover,
+.btn.btn-signin:active,
+.btn.btn-signin:focus {
+    background-color: rgb(12, 97, 33);
+}

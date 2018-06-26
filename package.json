@@ -1,0 +1,32 @@
+{
+  "name": "bbddgestiondoc",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "migrate_local": "./node_modules/.bin/sequelize db:migrate --url postgres://postgres:1234@localhost:5432/GestionDocente",
+    "migrate_local_undo": "./node_modules/.bin/sequelize db:migrate:undo --url postgres://postgres:1234@localhost:5432/GestionDocente",
+    "seed_local": "./node_modules/.bin/sequelize db:seed:all --url postgres://postgres:1234@localhost:5432/GestionDocente"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cas-authentication": "0.0.8",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "~2.5.7",
+    "express": "~4.16.0",
+    "express-flash": "0.0.2",
+    "express-partials": "^0.3.0",
+    "express-session": "^1.15.6",
+    "git": "^0.1.5",
+    "http-errors": "~1.6.2",
+    "method-override": "^2.3.10",
+    "morgan": "~1.9.0",
+    "nodemailer": "^4.6.7",
+    "pg": "^6",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.37.6",
+    "sequelize-cli": "^4.0.0",
+    "serve-favicon": "^2.5.0"
+  }
+}
