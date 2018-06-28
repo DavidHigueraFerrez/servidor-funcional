@@ -11,7 +11,7 @@
 <ul style="list-style-type:none">
     <li>Coordinador:
     <div class="autocomplete" style="width:500px;">
-    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombre %>" placeholder="<%= asign.coordinador.nombre %>">
+    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombre %>" placeholder="<%= asign.coordinador.nombre %>" onclick='LimpiarCoordinador()'>
     </div> 
     </li>
     <% for(var i=0; i< asign.grupos.length; i++){ %>
@@ -70,13 +70,17 @@ function AnadirProfesor(id){
   //$( "#"+id ).append('<div class="autocomplete" style="width:500px;"><input id="momentaneo" type="text" name="anadir" value="" placeholder="Seleccionar Profesor"></div> ' ); 
   document.getElementById(id).appendChild(node);
   let memomentaneo = document.getElementById(momentaneo)
-   console.log(numeroIncrementable)
    momentaneo.setAttribute('id', numeroIncrementable)
+   document.getElementById(numeroIncrementable).focus();
    autocomplete(document.getElementById(numeroIncrementable), profesores, profesores2, 'asignacionProfesores');
    numeroIncrementable++; 
 }
 
 function Volver(cancelarpath){
   window.location.replace(cancelarpath);
+}
+
+function LimpiarCoordinador(){
+ document.getElementById('coordinador').setAttribute('value',"");
 }
 </script>

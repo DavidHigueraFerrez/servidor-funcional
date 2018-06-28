@@ -20,7 +20,7 @@ module.exports = function (sequelize, DataTypes) {
             estadoProGDoc:{
                type: DataTypes.INTEGER
            },
-            fechaProgDpc: {
+            fechaProgDoc: {
                 type: DataTypes.DATE
             },
             estadoGrupos: {

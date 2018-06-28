@@ -72,13 +72,14 @@ function mostrar(id){
     celda.removeChild(p);
     let nuevoValor = input.getAttribute('placeholder')
     if (input.getAttribute('value')){
-      input.setAttribute('value', nuevoValor )
+      input.setAttribute('value','' )
     }
     input.setAttribute('type', 'text')
     autocomplete(input, profesores, profesores2, 'tribunales');
   }else if(p2){
     p2.setAttribute('id', "p_"+id);
   }
+	input.focus();
 }
 function Volver(cancelarpath){
   window.location.replace(cancelarpath);

@@ -215,7 +215,7 @@ exports.edit = function (req, res, next) {
     res.render('asignacionesCumplimentar',
                 {asign:asign,
                  pdID: pdID,
-                 cancelarpath: "" + req.baseUrl + "/respDoc/?pdID="+pdID+"&departamentoID="+departamentoID,   
+                 cancelarpath: "" + req.baseUrl + "/respDoc/?planAcronimo="+req.session.planAcronimo+"&departamentoID="+departamentoID,   
                  nuevopath : "" + req.baseUrl + "/respDoc/guardarAsignacion",
                  planAcronimo: req.session.planAcronimo,
                  menu: req.session.menu,
@@ -420,7 +420,7 @@ exports.getTribunales = function (req, res, next){
                 //console.log(req.baseUrl)
                 //console.log(req.path)
                 let nuevopath = "" + req.baseUrl + "/respdoc/guardarTribunales"
-                let cancelarpath = "" + req.baseUrl + "/respdoc/tribunales?pdID="+pdID+"&departamentoID="+departamentoID
+                let cancelarpath = "" + req.baseUrl + "/respdoc/tribunales?planAcronimo="+req.session.planAcronimo+"&departamentoID="+departamentoID
                 res.render('tribunales',
                     {
                         profesores: req.session.profesores,
@@ -453,7 +453,7 @@ exports.guardarTribunales = function (req, res, next) {
                 nuevaEntrada, /* set attributes' value */
                 { where: { identificador: tribunalId } } /* where criteria */
             ).then(() => {
-                res.redirect("" + req.baseUrl + "/respDoc/tribunales?pdID=2&departamentoID=D520&planAcronimo=" + planAcronimo)
+                res.redirect("" + req.baseUrl + "/respDoc/tribunales?departamentoID=D520&planAcronimo=" + planAcronimo)
             })
         } else {
             let promises = [];
@@ -485,12 +485,12 @@ exports.guardarTribunales = function (req, res, next) {
             })
             
             return Promise.all(promises).then(() => {
-                res.redirect("" + req.baseUrl + "/respDoc/tribunales?pdID=2&departamentoID=D520&planAcronimo=" + planAcronimo)
+                res.redirect("" + req.baseUrl + "/respDoc/tribunales?departamentoID=D520&planAcronimo=" + planAcronimo)
             });
             
         }
     }else{
-        res.redirect("" + req.baseUrl + "/respDoc/tribunales?pdID=2&departamentoID=D520&planAcronimo=" + planAcronimo)
+        res.redirect("" + req.baseUrl + "/respDoc/tribunales?departamentoID=D520&planAcronimo=" + planAcronimo)
     }
 }
 
