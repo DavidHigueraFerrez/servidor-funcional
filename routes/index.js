@@ -1,9 +1,13 @@
 let express = require('express');
+let app = require('../app')
 let router = express.Router();
 let Sequelize = require('sequelize');
 let models = require('../models');
 let respController = require('../controllers/respDep_controller');
 let permisosController = require('../controllers/permisos_controller');
+let jefeController = require('../controllers/abrirprogdoc_controller');
+let gestionController = require('../controllers/JE_controller')
+let cumplimentar = require('../controllers/cumplimentar')
 
 
 router.get('/a', function (req, res) {
@@ -20,25 +24,24 @@ router.get('/',permisosController.comprobarRolYPersona, function (req, res) {
   res.render('index');
 });
 
-//ruta que comprueba autenticacion para poder abrir una programacion docente
-router.get('/Gestion', permisosController.comprobarAdmins, function (req, res) {
-  res.render('gestion');
-});
-
 //ruta que permite que comprueba permisos para comprobar Grupos Cupos e Idiomas
 router.get('/GruposCuposIdiomas', permisosController.comprobarJefeEstudiosOSecretaria,  function (req, res) {
   res.render('desarrollo');
 });
 
 //ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
-router.get('/Cumplimentar', permisosController.comprobarAdmins, function (req, res) {
+router.get('/Cumplimentar', permisosController.comprobarAdmins, function (req, res, next) {
   req.session.menu = [];
   req.session.menu.push("drop_ProgDoc")
   req.session.menu.push("element_ProgDocCumplimentar")
-  res.render('cumplimentar', {
-    menu: req.session.menu,
-    path : req.baseUrl
-  });
+  next()
+}, cumplimentar.getPlanes);
+//ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
+router.get('/Gestion', permisosController.comprobarAdmins, function (req, res) {
+  req.session.menu = [];
+  req.session.menu.push("drop_ProgDoc")
+  req.session.menu.push("element_ProgDocGestion")
+  res.redirect(app.contextPath+"AbrirCerrar")
 });
 
 //ruta para comprobar permsisos para Asignar Tribunales(solo responsableDocente por ahora)
@@ -74,10 +77,15 @@ router.get('/Historial', permisosController.comprobarAdmins, function (req, res)
 //rutads de resodic
 router.get("/respDoc/tribunales", respController.getProgramacionDocente, respController.getTribunales)
 router.get("/respDoc/editAsignacion", respController.edit)
-router.get("/respDoc/aprobarAsignacion", respController.aprobarAsignacion)
-router.post("/respDoc/guardarAsignacion", respController.guardarAsignacion)
-router.post("/respDoc/guardarTribunales", respController.guardarTribunales)
-router.get("/respDoc/", respController.getProgramacionDocente, respController.get);  
+router.post("/respDoc/aprobarAsignacion", respController.aprobarAsignacion)
+router.post("/respDoc/guardarAsignacion", cumplimentar.anadirProfesor,respController.guardarAsignacion)
+router.post("/respDoc/aprobarTribunales", cumplimentar.anadirProfesor,respController.guardarTribunales, respController.aprobarTribunales)
+router.post("/respDoc/guardarTribunales", cumplimentar.anadirProfesor,respController.guardarTribunales, respController.reenviar)
+router.get("/respDoc/", respController.getProgramacionDocente, respController.get); 
+
+router.get("/AbrirCerrar", gestionController.gestionProgDoc)
+router.post("/abrirProgdoc", jefeController.abrirProgDoc)
+
 /*
 
 // Unauthenticated clients will receive a 401 Unauthorized response instead of

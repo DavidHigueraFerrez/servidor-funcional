@@ -9,6 +9,7 @@ let partials = require('express-partials');
 //context path para la aplicacion en el servidor
 let session = require('express-session');
 const contextPath = '/progdoc/';
+exports.contextPath = contextPath;
 
 //cas autentication
 let CASAuthentication = require('cas-authentication');
@@ -16,7 +17,7 @@ let CASAuthentication = require('cas-authentication');
 let cas = new CASAuthentication({
   cas_url: 'https://repo.etsit.upm.es/cas-upm/',
   //local
- // service_url: 'http://localhost:3000/progdoc',
+  //service_url: 'http://localhost:3000/progdoc',
   //despliegue
   service_url: 'https://pruebas.etsit.upm.es',
   cas_version: '3.0',
@@ -37,6 +38,8 @@ let permisosController = require('./controllers/permisos_controller');
 //borrar
 let respController = require('./controllers/respDep_controller');
 
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -49,7 +52,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 //local
 //app.use(express.static(path.join(__dirname, 'public')));
-//despliegue
+//despliegue y local
+
 app.use('/progdoc', express.static(path.join(__dirname, 'public')));
 
 
@@ -60,16 +64,20 @@ app.use( session({
   saveUninitialized : true,
 }));
 
+
 // Helper dinamico:
-app.use('', cas.bounce, function (req, res, next) {
+app.use('',function (req, res, next) {
   // Hacer visible req.session en las vistas
   res.locals.session = req.session;
+  next();
+});
+
+ app.use(contextPath, cas.bounce, function(req,res,next){
   if(!req.session.user){
     req.session.user = req.session[cas.session_info];
   } 
   next();
-});
-
+})
 //router para contexto
 app.use(contextPath, router);
 
@@ -77,10 +85,18 @@ app.use(contextPath, router);
 app.get(contextPath+"logout", function (req, res, next) {
   req.session.destroy(function (err){
     console.log('redirige y luego cas.logout')
-    res.redirect(contextPath);
+    res.redirect('/');
   });
 });
 
+
+//guardar contexto y redirigir
+app.use('/', cas.bounce, function(req, res){
+  if(!req.session.user){
+    req.session.user = req.session[cas.session_info];
+  }
+  res.redirect(contextPath);
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

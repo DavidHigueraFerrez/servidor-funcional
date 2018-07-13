@@ -22,20 +22,20 @@ let Persona = sequelize.import(path.join(__dirname, 'Persona'));
 let PlanEstudio = sequelize.import(path.join(__dirname, 'PlanEstudio'));
 let Profesor = sequelize.import(path.join(__dirname, 'Profesor'));
 let AsignacionProfesor = sequelize.import(path.join(__dirname, 'AsignacionProfesor'));
-let DireccionDepartamento = sequelize.import(path.join(__dirname, 'DireccionDepartamento'));
 let ProgramacionDocente = sequelize.import(path.join(__dirname, 'ProgramacionDocente'));
-let TribunalAsignatura = sequelize.import(path.join(__dirname, 'TribunalAsignatura'));
 let Horario = sequelize.import(path.join(__dirname, 'Horario'));
 let Hora = sequelize.import(path.join(__dirname, 'Hora'));
 let Rol = sequelize.import(path.join(__dirname, 'Rol'));
+let Itinerario = sequelize.import(path.join(__dirname, 'Itinerario'));
 
+/*
 //Relacion 1 a N entre DireccionDepartamento y Profesor
 Profesor.hasMany(DireccionDepartamento,  {foreignKey: 'DirectorDepartamento'});
 DireccionDepartamento.belongsTo(Departamento, { as: 'Director', foreignKey: 'DirectorDepartamento' });
 
 Profesor.hasMany(DireccionDepartamento,  {foreignKey: 'ResponsableDocenteDepartamento'});
 DireccionDepartamento.belongsTo(Departamento, { as: 'Responsable', foreignKey: 'ResponsableDocenteDepartamento' });
-
+*/
 // Relacion 1 a 1 entre Profesor y Persona:
 Persona.hasOne(Profesor, {foreignKey: 'ProfesorEmail'});
 
@@ -43,9 +43,11 @@ Persona.hasOne(Profesor, {foreignKey: 'ProfesorEmail'});
 Departamento.hasMany(Profesor, {foreignKey:'DepartamentoCodigo'})
 Profesor.belongsTo(Departamento, {foreignKey:'DepartamentoCodigo'})
 
+
 //Relacion 1 a N entre Departamento y Asignatura:
 Departamento.hasMany(Asignatura, {foreignKey:'DepartamentoResponsable'})
 Asignatura.belongsTo(Departamento,{foreignKey:'DepartamentoResponsable'})
+
 
 //Relacion 1 a N entre Asignatura y Examen
 Asignatura.hasMany(Examen)
@@ -81,25 +83,7 @@ Asignatura.belongsToMany(Grupo, { through: 'Horario' });
 Horario.hasMany(Hora, { foreignKey: 'HorarioId' });
 Hora.belongsTo(Horario, { foreignKey: 'HorarioId' });
 
-
-//Relacion 1 a N entre Tribunal y Asignatura (En realidad es uno a uno, pero da igual el 1 a N es un tipo de 1 a 1)
-TribunalAsignatura.hasMany(Asignatura,{foreignKey:'TribunalIdentificador'})
-Asignatura.belongsTo(TribunalAsignatura, { foreignKey: 'TribunalIdentificador' });
-//TribunalAsignatura.hasOne
-
-//Relacion 1 a N  entre profesor TribunalAsignatura (para Presidente, Secretario, Vocal y suplente)
-Profesor.hasMany(TribunalAsignatura, { foreignKey: 'PresidenteTribunalAsignatura' });
-TribunalAsignatura.belongsTo(Profesor, { as: 'Presidente', foreignKey: 'PresidenteTribunalAsignatura' });
-
-Profesor.hasMany(TribunalAsignatura, { foreignKey: 'VocalTribunalAsignatura' });
-TribunalAsignatura.belongsTo(Profesor, { as: 'Vocal', foreignKey: 'VocalTribunalAsignatura' });
-
-Profesor.hasMany(TribunalAsignatura, { foreignKey: 'SecretarioTribunalAsignatura' });
-TribunalAsignatura.belongsTo(Profesor, { as: 'Secretario', foreignKey: 'SecretarioTribunalAsignatura' });
-
-Profesor.hasMany(TribunalAsignatura, { foreignKey: 'SuplenteTribunalAsignatura' });
-TribunalAsignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAsignatura' });
-
+/*
 //Relacion 1 a N Profesor y PlanEstudio (JefeEstudio, subdirectorPosgrado CoordinadorTitulacion, DelegadoJefeEstudio, DelegadoSubdirect DelegadoCoordinadorTitulacion); Persona y PlanEstudio (Secretario) 
 Profesor.hasMany(PlanEstudio, { foreignKey: 'JefeEstudioPlanEstudio' });
 PlanEstudio.belongsTo(Profesor, { as: 'JefeEstudio', foreignKey: 'JefeEstudioPlanEstudio' });
@@ -123,6 +107,7 @@ PlanEstudio.belongsTo(Profesor, { as: 'CoordinadorTitulacionDelegado', foreignKe
 //Relacion 1 a N Persona y PlanEstudio (Secretario)
 Persona.hasMany(PlanEstudio, { foreignKey: 'SecretarioPlanEstudio' });
 PlanEstudio.belongsTo(Persona, { as: 'Secretario', foreignKey: 'SecretarioPlanEstudio' });
+*/
 
 //Relacion N a N Profesor y PlanEstudio (DirectorDepartamento y DirectorDepartamentoDelegado)
 //Para saber si es delegado se define una variable boolean en la tabla DireccionDepartamento
@@ -150,6 +135,32 @@ Departamento.belongsToMany(PlanEstudio, { through: 'Rol' });
 Persona.hasMany(Rol)
 Rol.belongsTo(Persona)
 
+//Relación 1 a N entre Plan e Itinerario -> ojo si se elimina un plan de estudio en la bbdd debe quedar para ver los de los años anteriores
+PlanEstudio.hasMany(Itinerario);
+Itinerario.belongsTo(PlanEstudio);
+
+//Relación 1 a N entre Itinerario y Asignatura
+Itinerario.hasMany(Asignatura);
+Asignatura.belongsTo(Itinerario);
+
+//Relación 1 a N entre Itineario y Grupo
+Itinerario.hasMany(Grupo);
+Grupo.belongsTo(Itinerario);
+
+//Relacion 1 a N  entre profesor Asignatura (para Presidente, Secretario, Vocal y suplente)
+Profesor.hasMany(Asignatura, { foreignKey: 'PresidenteTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, { as: 'Presidente', foreignKey: 'PresidenteTribunalAsignatura' });
+
+Profesor.hasMany(Asignatura, { foreignKey: 'VocalTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, { as: 'Vocal', foreignKey: 'VocalTribunalAsignatura' });
+
+Profesor.hasMany(Asignatura, { foreignKey: 'SecretarioTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, { as: 'Secretario', foreignKey: 'SecretarioTribunalAsignatura' });
+
+Profesor.hasMany(Asignatura, { foreignKey: 'SuplenteTribunalAsignatura' });
+Asignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAsignatura' });
+
+
 
 //Crear tablas pendientes
 sequelize.sync();
@@ -163,11 +174,10 @@ exports.Asignatura = Asignatura; // exportar definición de tabla Asignatura
 exports.Grupo = Grupo; // exportar definición de tabla Grupo
 exports.Horario = Horario; // exportar definición de tabla Horario
 exports.Hora = Hora; //exporta definición de tabla Hora
-exports.TribunalAsignatura = TribunalAsignatura; // exportar definición de tabla TribunalAsignatura
 exports.PlanEstudio = PlanEstudio; // exportar definición de tabla PlanEstudio
-exports.DireccionDepartamento = DireccionDepartamento; // exportar definición de tabla PlanEstudio
 exports.ProgramacionDocente = ProgramacionDocente; // exportar definición de tabla ProgramacionDocente
 exports.Examen = Examen; // exportar definición de tabla Examen
 exports.Historial = Historial; // exportar definición de tabla Historial
 exports.Rol = Rol; //exportar definición de tabla Rol
+exports.Itinerario = Itinerario; //exportar definición de tabla Itinerario
 exports.sequelize = sequelize;

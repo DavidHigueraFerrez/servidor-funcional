@@ -10,6 +10,9 @@ module.exports = function (sequelize, DataTypes) {
             },
             nombre: {
                 type: DataTypes.STRING
+            },
+            nombreCompleto: {
+                type: DataTypes.STRING
             }
 
         },

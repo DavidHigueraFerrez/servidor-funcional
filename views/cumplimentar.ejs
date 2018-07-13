@@ -1,21 +1,37 @@
     
     <body>
-    <p>Consulta Programacion</p>
+    <p>Cumplimentar Programación</p>
     <div class="row col-sm space-above-below">
         <div clas="container">
          <select id="selectPlan" class="selectpicker" onchange="cambiarPD()">
-            <option value='GITST'>GITST</option>
-            <option value='GIB'>GIB</option>
-            <option value='MUIT'>MUIT</option>
-            <option value='MUTSC'>MUTSC</option>
-            <option value='MUIRST'>MUIRST</option>
-            <option value='MUEFSV'>MUEFSV</option>
-            <option value='MUISE'>MUISE</option>
-            <option value='MUIB'>MUIB</option>
-            <option value='MUTECI'>MUTECI</option>
+                <% for(let i=0; i < planEstudios.length; i++) { 
+                    if (planEstudios[i].nombre !== null){ %>
+                    <option value="<%=planEstudios[i].nombre%>"><%=planEstudios[i].nombre%></option> 
+                    <%}else {%>
+                    <option value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].codigo%></option> 
+                    <%}
+                }%>
          </select>
         </div>
     </div>
+    <% if (locals.departamentoID && locals.departamentosResponsables) { %>
+     <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
+     <div class="row col-sm space-above-below">
+        <div clas="container">
+         <select id="selectDepartamento" class="selectpicker" onchange="cambiarDepart()">
+            <option value="<%=departamentoID%>"><%=departamentoID%></option>
+            <% for(let i=0; i < departamentosResponsables.length; i++) { 
+                 if (departamentosResponsables[i].codigo !== departamentoID){%>
+                 <option value="<%=departamentosResponsables[i].codigo%>"><%=departamentosResponsables[i].codigo%></option> 
+                <%}
+            }%>
+             
+
+         </select>
+        </div>
+    </div>
+
+  <%}%>
     <div class="tab">
         <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
@@ -34,10 +50,19 @@
   <%} else {%>
     <input id='submenu' type="hidden">
   <%}%>
+  <% if (locals.departamentoID) { %>
+     <input id='departamento' type="hidden" value="<%=departamentoID%>">
+  <%} else {%>
+    <input id='departamento' type="hidden">
+  <%}%>
 
 <script>
 function cambiarSubmenu(evt, submenu) {
     let pAcronimo = document.getElementById("selectPlan").value;
+    let departamento = document.getElementById('departamento');
+    if(departamento){
+        selectDepartamentoValue = departamento.value;
+        }
     let i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -51,11 +76,11 @@ function cambiarSubmenu(evt, submenu) {
     evt.currentTarget.className += " active";
     
     if(submenu === 'Profesores'){
-        let url = "/progdoc/respDoc/?planAcronimo="+pAcronimo+"&departamentoID=D520"
+        let url = "/progdoc/respDoc/?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Tribunales'){
-        let url = "/progdoc/respDoc/tribunales?planAcronimo="+pAcronimo+"&departamentoID=D520"
+        let url = "/progdoc/respDoc/tribunales?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     
@@ -68,6 +93,14 @@ function cambiarPD(){
     let url = parseStringQuery(search);
     window.location.replace(url);
     
+}
+
+function cambiarDepart(){
+    let depart = document.getElementById("selectDepartamento").value;
+    let search = parseQueryString();
+    search.departamentoID = depart;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
 }
 
 let parseQueryString = function() {
@@ -91,13 +124,21 @@ let parseStringQuery = function ( obj ) {
 
 document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
 function actualizarSelectyBarra() {
-    let select = document.getElementById('plan').value
-    if(!select) {
-        select= "GITST"
+    let selectValue = document.getElementById('plan').value
+    if(!selectValue) {
+        selectValue= "GITST"
     }
-    
-    document.getElementById('selectPlan').value = select;
-    
+    document.getElementById('selectPlan').value = selectValue;
+
+    let departamento = document.getElementById('departamento');
+    if(departamento){
+        let selectDepartamentoValue = selectDepartamento.value;
+        if(!selectDepartamentoValue){
+            selectDepartamentoValue = "D520"
+        }
+        document.getElementById('selectDepartamento').value = selectDepartamentoValue;
+    }
+        
     let submenu = document.getElementById('submenu').value
     if(!submenu) {
         submenu= "Estado"
@@ -105,11 +146,6 @@ function actualizarSelectyBarra() {
     console.log(submenu)
     document.getElementById(submenu).style.display = "block";
     document.getElementById(submenu).className += " active";
-    
-       
-
-    
-
 }
 
 </script>

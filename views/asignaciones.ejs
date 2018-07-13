@@ -1,75 +1,101 @@
 <!-- Local -->
-<!-- <script src="/js/autocomplete.js"></script>-->
+<!--<script src="/js/autocomplete.js"></script>-->
 <!-- despliegue -->
- <script src="/progdoc/js/autocomplete.js"></script>
+ <script src="/progdoc/js/autocomplete.js"></script> 
 <%- include cumplimentar.ejs %>
 <div>
-<ul style="list-style-type:none">
-<% for(var i=0; i < asignacion.length; i++) { %> 
-  <% if(i===0) { %>
-    <li>
-    <h2>Curso <%= asignacion[i].curso %></h2>
-   <% } %>
-  <% if(i>=1 && asignacion[i].curso !== asignacion[i-1].curso) { %>
-  </li>
-  <li>
-    <h2>Curso <%= asignacion[i].curso %></h2>
-    <% } %>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{%>
     <ul style="list-style-type:none">
-      <li>
-     <% if(estadoProfesores === 0) { %>
-      <form action="<%= nuevopath %>" method="get">
-      <input type="hidden", name = 'acronimo', value='<%= asignacion[i].acronimo %>'>
-      <input type="hidden", name = 'pdID', value='<%= pdID %>'>
-      <input type="hidden", name = 'departamentoID', value='<%= departamentoID %>'>
-    <h3> <%= asignacion[i].acronimo %> <input type="submit" value="Editar"></h3>
-      </form>
-      <% } else{%>
-      <h3> <%= asignacion[i].acronimo %></h3>
-      <% }%>
-       <ul style="list-style-type:none">
-       <li>
-         <span> Coordinador: <%= asignacion[i].coordinador.nombre %> </span>
-       </li>
-    <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
-     
+    <% for(let i=0; i < asignacion.length; i++) { %> 
+      <% if(i===0) { %>
         <li>
-      <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %>: </span>
-      <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){ %>
-      <span><%= asignacion[i].grupos[j].profesors[k].nombre %>;</span>
-    <% } %>
+        <h2>Curso <%= asignacion[i].curso %></h2>
+      <% } %>
+      <% if(i>=1 && asignacion[i].curso !== asignacion[i-1].curso) { %>
+      </li>
+      <li>
+        <h2>Curso <%= asignacion[i].curso %></h2>
+        <% } %>
+        <ul style="list-style-type:none">
+          <li>
+        <% if(estadoProfesores[departamentoID] === 1) { %>
+          <form action="<%= nuevopath %>" method="get">
+           <% if (asignacion[i].acronimo !== null){ %>
+          <input type="hidden", name = 'acronimo', value='<%= asignacion[i].acronimo %>'>
+          <% }else{%>
+          <input type="hidden", name = 'acronimo', value='<%= asignacion[i].nombre %>'>
+          <% } %>
+          <input type="hidden", name = 'pdID', value='<%= pdID %>'>
+          <input type="hidden", name = 'departamentoID', value='<%= departamentoID %>'>
+          <% if (asignacion[i].acronimo !== null){ %>
+               <h3> <%= asignacion[i].acronimo %> <input type="submit" value="Editar"></h3>
+            <% }else{%>
+               <h3> <%= asignacion[i].nombre %> <input type="submit" value="Editar"></h3>
+            <% } %>
+          </form>
+          <% } else{%>
+            <% if (asignacion[i].acronimo !== null){ %>
+              <h3><%= asignacion[i].acronimo %></h3>
+            <% }else{%>
+              <h3><%= asignacion[i].nombre%></h3>
+            <% }
+           }%>
+          <ul style="list-style-type:none">
+          <li>
+            <span> Coordinador: <%= asignacion[i].coordinador.nombre %> </span>
+          </li>
+        <% for(var j=0; j< asignacion[i].grupos.length; j++){ %>
+        
+            <li>
+          <span> Grupo <%= asignacion[i].grupos[j].GrupoNombre %>: </span>
+          <%for(var k=0; k< asignacion[i].grupos[j].profesors.length; k++){ %>
+          <span><%= asignacion[i].grupos[j].profesors[k].nombre %>;</span>
+        <% } %>
+            </li>
+      <% } %> 
+        </ul>
         </li>
-  <% } %> 
-    </ul>
+    </ul>  
+    <% } %>
     </li>
- </ul>  
-<% } %>
-</li>
-</ul>
+    </ul>
+    <% if(estadoProfesores[departamentoID] === 1) { %>
+    <form action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()">
+    <input type="hidden" name="pdID" value='<%= pdID %>'>
+    <input type="hidden" name="departamentoID" value='<%=departamentoID%>'>
+    <input type="hidden" name='estadoProfesores' value= '<%=JSON.stringify(estadoProfesores)%>'>
+    <input type='submit' value='Aprobar Asignación Profesores'>
+    </form>
+    <% } %>
+    <% if(estadoProfesores[departamentoID] === 2) { %>
+    <form id="formDecision" action="<%= aprobarpath %>" method="post">
+    <input type="hidden" name="pdID" value='<%= pdID %>'>
+    <input id="decision" type="hidden" name="decision" value='aceptar'>
+    <input type="hidden" name="departamentoID" value='<%=departamentoID%>'>
+    <input type="hidden" name='estadoProfesores' value= '<%=JSON.stringify(estadoProfesores)%>'>
+    <button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Profesores</button>
+    <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Profesores</button>
+    </form>
+    <% } 
+    }%>
+
 </div>
-<% if(estadoProfesores === 0) { %>
-<form action="<%= aprobarpath %>" method="get" onsubmit="return Enviar()">
-<input type="hidden" name="pdID" value='<%= pdID %>'>
-<input type="hidden" name='estadoProfesores' value= '<%= estadoProfesores %>'>
-<input type='submit' value='Aprobar Asignación Profesores'>
-</form>
-<% } %>
-<% if(estadoProfesores === 1) { %>
-<form id="formDecision" action="<%= aprobarpath %>" method="get">
-<input type="hidden" name="pdID" value='<%= pdID %>'>
-<input id="decision" type="hidden" name="decision" value='aceptar'>
-<input type="hidden" name='estadoProfesores' value= '<%= estadoProfesores %>'>
-<button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Profesores</button>
-<button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Profesores</button>
-</form>
-<% } %>
 <script>
 
+let estado = <%-JSON.stringify(estado)%>
 let profesores = <%-JSON.stringify(profesores)%>
-//console.log('aaaaa')
-//console.log(profesores)
-let profesores2 = quitAcents(profesores)
-//document.getElementsByTagName('body')[0].onload = changeSelect();
+let profesores2 ="";
+if(estado === null){
+  
+  //console.log('aaaaa')
+  //console.log(profesores)
+  profesores2 = quitAcents(profesores)
+  //document.getElementsByTagName('body')[0].onload = changeSelect();
+}
+
+
 
 function Enviar(){
   return confirm("Una vez aprobada la asignación de profesores no podrá modificarla a menos que... ¿Seguro que quiere aprobarla?")

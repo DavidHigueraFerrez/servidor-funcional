@@ -23,10 +23,7 @@ exports.comprobarRolYPersona = function(req,res,next){
     console.log(role);
     if(mail==='david.higuera.ferrez@alumnos.upm.es'||mail==='javier.conde.diaz@alumnos.upm.es'){
         next();
-    }else if(role!=='D'){
-        console.log('no tiene acceso permitido porque no eres profesor');
-        res.render('noPermitido', {layout:false});
-    } else{
+    }else{
         //comprobamos en la tabla de persona si esta o no esta
         models.Persona.findById(mail).then(persona => {
             if (persona) {

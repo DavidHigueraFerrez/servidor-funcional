@@ -9,6 +9,7 @@
     "seed_local": "./node_modules/.bin/sequelize db:seed:all --url postgres://postgres:1234@localhost:5432/GestionDocente"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "cas-authentication": "0.0.8",
     "cookie-parser": "~1.4.3",
@@ -22,6 +23,7 @@
     "http-errors": "~1.6.2",
     "method-override": "^2.3.10",
     "morgan": "~1.9.0",
+    "node-rest-client": "^3.1.0",
     "nodemailer": "^4.6.7",
     "pg": "^6",
     "pg-hstore": "^2.3.2",

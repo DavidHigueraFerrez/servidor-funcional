@@ -4,6 +4,7 @@ let Sequelize = require('sequelize');
 const nodemailer = require('nodemailer');
 let mail = require('../mail/mail');
 const op = Sequelize.Op;
+let estados = require('../estados');
 
 
 
@@ -18,11 +19,8 @@ exports.getProgramacionDocente = function (req, res, next){
             include: [{
                 model: models.ProgramacionDocente,
                 where: {
-                    estadoProGDoc: {
-                        [op.gt]: 0,
-                        [op.lt]: 6
-                    }
-
+                    estadoProGDoc: 
+                        estados.estadoProgDoc.abierto
                 }
             }],
             raw: true

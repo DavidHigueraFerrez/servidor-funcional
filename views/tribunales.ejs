@@ -1,10 +1,17 @@
 <!-- Local -->
-<!-- <script src="/js/autocomplete.js"></script> -->
+<!--<script src="/js/autocomplete.js"></script>-->
 <!-- despliegue -->
-<script src="/progdoc/js/autocomplete.js"></script> 
+<script src="/progdoc/js/autocomplete.js"></script>
 <%- include cumplimentar.ejs %>
 <div>
-<form autocomplete="off" action="<%= nuevopath %>" method="post" >
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{
+  if(estadoTribunales[departamentoID] === 1) {%>
+<form id="formulario" autocomplete="off" action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()" >
+<input type="hidden", name="pdID", value='<%= pdID %>'>
+<input type="hidden", name="departamentoID", value='<%=departamentoID%>'>
+<input type="hidden", name='estadoTribunales', value='<%=JSON.stringify(estadoTribunales)%>'>
 <table class="table">
   <thead>
     <tr>
@@ -17,7 +24,13 @@
   <tbody>
   <% for(var i=0; i < tribunales.length; i++) { %>
     <tr>
-      <th scope="row"><%= tribunales[i].acronimo%></th>
+      <th scope="row">
+        <% if (tribunales[i].acronimo !== null){ %>
+        <%= tribunales[i].acronimo%>
+        <% }else{%>
+        <%= tribunales[i].nombre%>
+        <% } %> 
+      </th>
       <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente' onclick="mostrar('tribunal_<%=tribunales[i].tribunalId%>_Presidente')">
       <% if(tribunales[i].presidenteNombre) { %>
       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
@@ -49,12 +62,81 @@
 <% } %> 
   </tbody>
 </table>
-<input type="submit" value='Guardar'>
+<input type="submit" value='Guardar y Aprobar Asignación Tribunales'>
 <button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+<button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
 </form>
+<% }else{ %>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Presidente</th>
+      <th scope="col">Vocal</th>
+      <th scope="col">Secretario</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for(var i=0; i < tribunales.length; i++) { %>
+    <tr>
+      <th scope="row">
+          <%if (tribunales[i].acronimo !== null){ %>
+            <%= tribunales[i].acronimo%>
+          <% }else{%>
+          <%= tribunales[i].nombre%>
+          <% } %> 
+      </th>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>
+      <% if(tribunales[i].presidenteNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'><%= tribunales[i].presidenteNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Presidente'>-</p>
+      <% } %> 
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>
+      <% if(tribunales[i].vocalNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'><%= tribunales[i].vocalNombre%></p>
+      <% } else{ %>
+       <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Vocal'>-</p>
+      <% } %>
+      </td>
+      <td id='td_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>
+      <% if(tribunales[i].secretarioNombre) { %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'><%= tribunales[i].secretarioNombre%></p>
+      <% } else{ %>
+      <p id='p_tribunal_<%=tribunales[i].tribunalId%>_Secretario'>-</p>
+      <% } %>
+      </td>
+    </tr>
+<% } %> 
+  </tbody>
+</table>
+<% } %>
+    <% if(estadoTribunales[departamentoID] === 2) { %>
+    <form id="formDecision" action="<%= aprobarpath %>" method="post">
+    <input type="hidden" name="pdID" value='<%= pdID %>'>
+    <input id="decision" type="hidden" name="decision" value='aceptar'>
+    <input type="hidden" name="departamentoID" value='<%=departamentoID%>'>
+    <input type="hidden" name='estadoTribunales' value= '<%=JSON.stringify(estadoTribunales)%>'>
+    <button type="button" onclick="Decidir('aceptar')">Aceptar Asignación Tribunales</button>
+    <button type="button" onclick="Decidir('rechazar')">No aceptar Asignación Tribunales</button>
+    </form>
+    <% } 
+    }%>
+</div>
+<%- include nuevoProfesor.ejs %>
 <script>
+let form = document.getElementById("formulario");
+let estado = <%-JSON.stringify(estado)%>
 let profesores = <%-JSON.stringify(profesores)%>
-let profesores2 = quitAcents(profesores)
+let profesores2 ="";
+if(estado === null){
+  
+  //console.log('aaaaa')
+  //console.log(profesores)
+  profesores2 = quitAcents(profesores)
+  //document.getElementsByTagName('body')[0].onload = changeSelect();
+}
 function mostrar(id){
   let celda = document.getElementById("td_"+id);
   //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
@@ -72,16 +154,33 @@ function mostrar(id){
     celda.removeChild(p);
     let nuevoValor = input.getAttribute('placeholder')
     if (input.getAttribute('value')){
-      input.setAttribute('value','' )
+      input.setAttribute('value', '' )
     }
     input.setAttribute('type', 'text')
     autocomplete(input, profesores, profesores2, 'tribunales');
   }else if(p2){
     p2.setAttribute('id', "p_"+id);
   }
-	input.focus();
+  input.focus();
 }
 function Volver(cancelarpath){
   window.location.replace(cancelarpath);
+}
+function Guardar(nuevopath){
+  let form2 = document.getElementById("formulario");
+  form2.setAttribute('action', nuevopath);
+  form2.submit();
+}
+
+function Enviar(){
+  return confirm("Una vez aprobada la asignación de tribunales no podrá modificarla a menos que... ¿Seguro que quiere aprobarla?")
+}
+
+function Decidir(decision){
+  let dec = document.getElementById('decision');
+  dec.setAttribute('value', decision)
+  if(confirm("Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?")){
+    document.getElementById("formDecision").submit();
+  }
 }
 </script>

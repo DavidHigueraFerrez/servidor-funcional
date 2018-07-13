@@ -31,14 +31,14 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.DATE
             },
             estadoProfesores: {
-                type: DataTypes.INTEGER
+                type: DataTypes.JSONB
             },
             //fecha actualización de profesores
             fechaProfesores: {
                 type: DataTypes.DATE
             },
             estadoTribunales: {
-                type: DataTypes.INTEGER
+                type: DataTypes.JSONB
             },
             //fecha actualización de tribunales
             fechaTribunales: {

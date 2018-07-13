@@ -21,6 +21,18 @@ function autocomplete(inp, obj, obj2, opcion) {
         /*append the DIV element as a child of the autocomplete container:*/
         this.parentNode.appendChild(a);
         /*for each item in the object...*/
+
+        //otros profesores ...
+        let otro= document.createElement("DIV");
+        otro.innerHTML = "...OTRO";
+        /*insert a input field that will hold the current obj item's value:*/
+        /*execute a function when someone clicks on the item value (DIV element):*/
+        otro.addEventListener("click", function (e) {
+            let nuevoProfesorForm = document.getElementById("nuevoProfesorForm");
+            nuevoProfesorForm.setAttribute("class", "");
+        })
+        a.appendChild(otro);
+
         for (i = 0; i < obj.length; i++) {
             let encontrado = true;
             for (k = 0; k < values.length; k++) {
@@ -28,7 +40,6 @@ function autocomplete(inp, obj, obj2, opcion) {
                     encontrado = false;
                 }
             }
-            /*check if the item starts with the same letters as the text field value:*/
             if (encontrado) {
                 /*create a DIV element for each matching element:*/
                 let objeto = obj2[i]
@@ -49,6 +60,9 @@ function autocomplete(inp, obj, obj2, opcion) {
                         let parent = inp.parentNode;
                         let abuelo = parent.parentNode;
                         let grupo = abuelo.getAttribute('id').split("_")[2]
+                        if(grupo === ""){
+                            grupo = "No hay grupo"
+                        }
                         let idList = inp.getAttribute('id');
                         abuelo.removeChild(parent);
                         inp.setAttribute("type", 'hidden')
