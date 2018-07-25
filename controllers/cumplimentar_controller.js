@@ -1,6 +1,7 @@
 let app = require('../app')
 let models = require('../models');
 let Sequelize = require('sequelize');
+let estados = require('../estados');
 
 exports.getPlanes = function (req, res, next){
         models.PlanEstudio.findAll({
@@ -8,19 +9,90 @@ exports.getPlanes = function (req, res, next){
         raw: true
     }).then(function (planesBBDD) {
         req.session.planEstudios = planesBBDD;
-        res.render('cumplimentar', {
-            menu: req.session.menu,
-            path: req.baseUrl,
-            planEstudios: req.session.planEstudios
-        });
+        next();
     })
+}
+
+exports.getProgramacionDocente = function (req, res, next) {
+    let planAcronimo = req.query.planAcronimo;
+    let departamentoID = req.query.departamentoID;
+    if (departamentoID) {
+        req.session.departamentoID = departamentoID;
+    }
+    //el planAcronimo si no existe acronimo sera el código, por eso el or
+    if (planAcronimo) {
+        req.session.planAcronimo = planAcronimo
+        models.PlanEstudio.findOne({
+            attributes: ['nombre', 'codigo'],
+            where: Sequelize.or(
+                { nombre: planAcronimo },
+                { codigo: planAcronimo }
+            )
+            ,
+            include: [{
+                model: models.ProgramacionDocente,
+                where: {
+                    estadoProGDoc: estados.estadoProgDoc.abierto
+                }
+            }],
+            raw: true
+        })
+            .then(function (param) {
+                res.locals.progDoc = param;
+                //console.log(param);
+                if (param) {
+                    let query = 'SELECT distinct  "DepartamentoResponsable", public."Departamentos".nombre FROM public."Asignaturas" p  inner join public."Departamentos" on p."DepartamentoResponsable" = public."Departamentos".codigo WHERE p."ProgramacionDocenteIdentificador" = :pdId ';
+                    return models.sequelize.query(query = query,
+                        { replacements: { pdId: param['ProgramacionDocentes.identificador'] } },
+                    ).then(departamentosResponsables => {
+                        let depResponsables = [];
+                        departamentosResponsables[0].forEach(function (d) {
+                            let newDepartamento = {};
+                            newDepartamento.nombre = d.nombre;
+                            newDepartamento.codigo = d.DepartamentoResponsable;
+                            depResponsables.push(newDepartamento)
+                        })
+                        if (depResponsables.length >= 0) {
+                            res.locals.departamentosResponsables = depResponsables;
+                        }
+
+                        next();
+
+                    })
+                } else {
+                    next();
+                }
+            })
+            .catch(function (error) {
+                console.log("Error:", error);
+                next(error);
+            });
+
+    } else {
+        delete req.session.planAcronimo
+        next()
+    }
+
+}
+
+exports.getCumplimentar = function(req,res,next){
+    res.render('cumplimentar', {
+        menu: req.session.menu,
+        path: req.baseUrl,
+        planAcronimo: req.session.planAcronimo,
+        planEstudios: req.session.planEstudios
+    });
+}
+
+exports.getGestion = function (req, res, next) {
+    res.redirect(app.contextPath + "AbrirCerrar")
 }
 
 exports.anadirProfesor = function (req, res, next){
         let personaToAnadir = [];
         let profesorToAnadir = [];
         let profesoresNuevos = req.body.nuevoProfesor;
-        console.log(profesoresNuevos)
+        //console.log(profesoresNuevos)
     
     if (Array.isArray(profesoresNuevos)) {
         //borro los profesores pq pueden haber nuevos.

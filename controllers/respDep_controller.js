@@ -2,73 +2,13 @@ let app = require('../app')
 let models = require('../models');
 let Sequelize = require('sequelize');
 const nodemailer = require('nodemailer');
-//let mail = require('../mail/mail');
+let mail = require('../mail/mail');
 const op = Sequelize.Op;
 let estados = require('../estados');
 
 
 
-exports.getProgramacionDocente = function (req, res, next){
-    let planAcronimo = req.query.planAcronimo;
-    let departamentoID = req.query.departamentoID;
-    if (departamentoID){
-        req.session.departamentoID = departamentoID;
-    }
-    //el planAcronimo si no existe acronimo sera el código, por eso el or
-    if(planAcronimo){
-        req.session.planAcronimo = planAcronimo
-        models.PlanEstudio.findOne({
-            attributes: ['nombre', 'codigo'],
-            where:  Sequelize.or(
-                    {nombre: planAcronimo},
-                    {codigo: planAcronimo}
-                )
-            ,
-            include: [{
-                model: models.ProgramacionDocente,
-                where: {
-                    estadoProGDoc: estados.estadoProgDoc.abierto                  
-                }
-            }],
-            raw: true
-        })
-            .then(function (param) {
-                res.locals.progDoc = param;
-                console.log(param);
-                if(param){
-                    let query = 'SELECT distinct  "DepartamentoResponsable", public."Departamentos".nombre FROM public."Asignaturas" p  inner join public."Departamentos" on p."DepartamentoResponsable" = public."Departamentos".codigo WHERE p."ProgramacionDocenteIdentificador" = :pdId ';
-                    return models.sequelize.query(query = query,
-                        { replacements: { pdId: param['ProgramacionDocentes.identificador'] } },
-                    ).then(departamentosResponsables => {
-                        let depResponsables = [];
-                        departamentosResponsables[0].forEach(function (d) {
-                            let newDepartamento = {};
-                            newDepartamento.nombre = d.nombre;
-                            newDepartamento.codigo = d.DepartamentoResponsable;
-                            depResponsables.push(newDepartamento)
-                        })
-                        if(depResponsables.length >= 0){
-                            res.locals.departamentosResponsables = depResponsables;
-                        }
-                        
-                        next();
-                        
-                    })
-                }else{
-                    next();
-                }
-            })
-            .catch(function (error) {
-                console.log("Error:", error);
-                next(error);
-            });
 
-    }else{
-        delete req.session.planAcronimo
-        next()
-    }
-   
-}
 
 // GET /respDoc/:pdID/:departamentoID
 exports.get = function (req, res, next) {
@@ -167,7 +107,9 @@ exports.get = function (req, res, next) {
                 include: [{
                     //left join 
                     model: models.AsignacionProfesor,
-
+                    where: {
+                        Dia:null  //cojo las que no son de horario
+                    },
                     attributes: ['ProfesorId', 'GrupoId', 'identificador'],
                     include: [{
                         model: models.Grupo,

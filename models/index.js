@@ -23,8 +23,6 @@ let PlanEstudio = sequelize.import(path.join(__dirname, 'PlanEstudio'));
 let Profesor = sequelize.import(path.join(__dirname, 'Profesor'));
 let AsignacionProfesor = sequelize.import(path.join(__dirname, 'AsignacionProfesor'));
 let ProgramacionDocente = sequelize.import(path.join(__dirname, 'ProgramacionDocente'));
-let Horario = sequelize.import(path.join(__dirname, 'Horario'));
-let Hora = sequelize.import(path.join(__dirname, 'Hora'));
 let Rol = sequelize.import(path.join(__dirname, 'Rol'));
 let Itinerario = sequelize.import(path.join(__dirname, 'Itinerario'));
 
@@ -74,14 +72,9 @@ AsignacionProfesor.belongsTo(Grupo, { foreignKey: 'GrupoId' })
 
 
 
-//Relacion N a N a entre Grupo y Asignatura
-Grupo.belongsToMany(Asignatura, { through: 'Horario' });
-Asignatura.belongsToMany(Grupo, { through: 'Horario' });
 
 
-//Relacion 1 a N entre Horario y Hora
-Horario.hasMany(Hora, { foreignKey: 'HorarioId' });
-Hora.belongsTo(Horario, { foreignKey: 'HorarioId' });
+
 
 /*
 //Relacion 1 a N Profesor y PlanEstudio (JefeEstudio, subdirectorPosgrado CoordinadorTitulacion, DelegadoJefeEstudio, DelegadoSubdirect DelegadoCoordinadorTitulacion); Persona y PlanEstudio (Secretario) 
@@ -172,8 +165,6 @@ exports.Persona = Persona;   // exportar definición de tabla Persona
 exports.Departamento = Departamento; // exportar definición de tabla Departamento
 exports.Asignatura = Asignatura; // exportar definición de tabla Asignatura
 exports.Grupo = Grupo; // exportar definición de tabla Grupo
-exports.Horario = Horario; // exportar definición de tabla Horario
-exports.Hora = Hora; //exporta definición de tabla Hora
 exports.PlanEstudio = PlanEstudio; // exportar definición de tabla PlanEstudio
 exports.ProgramacionDocente = ProgramacionDocente; // exportar definición de tabla ProgramacionDocente
 exports.Examen = Examen; // exportar definición de tabla Examen

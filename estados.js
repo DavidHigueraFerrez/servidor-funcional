@@ -16,3 +16,8 @@ exports.estadoTribunal = {
     aprobadoResponsable: 2,
     aprobadoDirector: 3
 }
+
+exports.estadoHorario = {
+    abierto: 1,
+    aprobadoCoordinador: 2
+}

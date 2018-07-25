@@ -1,4 +1,4 @@
-/*let secrets = require('../config/secrets');
+let secrets = require('../config/secrets');
 const nodemailer = require('nodemailer');
 let smtpConfig = {
     host: 'smtp.upm.es',
@@ -9,4 +9,3 @@ let smtpConfig = {
 let transporter = nodemailer.createTransport(smtpConfig)
 
 exports.mailTransporter = transporter; // exportar el mail transporter
-*/

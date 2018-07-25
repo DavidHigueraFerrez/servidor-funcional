@@ -1,6 +1,21 @@
     
     <body>
     <p>Gestión</p>
+    <% if (locals.planAcronimo && locals.planEstudios && (locals.submenu === "Grupos")) { %>
+    <div class="row col-sm space-above-below">
+        <div clas="container">
+         <select id="selectPlan" onchange="cambiarPD()">
+                <% for(let i=0; i < planEstudios.length; i++) { 
+                    if (planEstudios[i].nombre !== null){ %>
+                    <option value="<%=planEstudios[i].nombre%>"><%=planEstudios[i].nombre%></option> 
+                    <%}else {%>
+                    <option value="<%=planEstudios[i].codigo%>"><%=planEstudios[i].codigo%></option> 
+                    <%}
+                }%>
+         </select>
+        </div>
+    </div>
+    <%}%>
     
     <div class="tab">
         <button id='AbrirCerrar' class="tablinks" onclick="cambiarSubmenu(event, 'AbrirCerrar')">Abrir/Cerrar</button>
@@ -8,6 +23,7 @@
         <button id='Calendario' class="tablinks" onclick="cambiarSubmenu(event, 'Calendario')">Calendario</button>
         <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
     </div>
+
     <% if (locals.planAcronimo) { %>
      <input id='plan' type="hidden" value="<%=planAcronimo%>">
   <%} else {%>
@@ -21,6 +37,13 @@
 
 <script>
 function cambiarSubmenu(evt, submenu) {
+    let elementPlan = document.getElementById("selectPlan")
+    let pAcronimo = 'GITST';
+    if (elementPlan){
+        pAcronimo = document.getElementById("selectPlan").value
+    }else if (document.getElementById("plan").value){
+        pAcronimo = document.getElementById("plan").value
+    }
     let i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -36,6 +59,10 @@ function cambiarSubmenu(evt, submenu) {
         let url = "/progdoc/AbrirCerrar"
         window.location.replace(url);
     }
+    if (submenu === 'Grupos'){
+    let url = "/progdoc/gestionGrupos/getGrupos?planAcronimo="+pAcronimo
+    window.location.replace(url);
+    } 
 
     
 }
@@ -70,13 +97,14 @@ let parseStringQuery = function ( obj ) {
 
 document.getElementsByTagName('body')[0].onload = actualizarSelectyBarra();
 function actualizarSelectyBarra() {
-    let select = document.getElementById('plan').value
-    if(!select) {
-        select= "GITST"
+    let selectValue = document.getElementById('plan').value
+    if(!selectValue) {
+        selectValue= "GITST"
     }
-    
-    //document.getElementById('selectPlan').value = select;
-    
+    let element2 = document.getElementById('selectPlan')
+    if (element2){
+        document.getElementById('selectPlan').value = selectValue;
+    }     
     let submenu = document.getElementById('submenu').value
     if(!submenu) {
         submenu= "AbrirCerrar"
@@ -84,11 +112,6 @@ function actualizarSelectyBarra() {
     console.log(submenu)
     document.getElementById(submenu).style.display = "block";
     document.getElementById(submenu).className += " active";
-    
-       
-
-    
-
 }
 
 </script>

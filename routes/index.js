@@ -7,7 +7,9 @@ let respController = require('../controllers/respDep_controller');
 let permisosController = require('../controllers/permisos_controller');
 let jefeController = require('../controllers/abrirprogdoc_controller');
 let gestionController = require('../controllers/JE_controller')
-let cumplimentar = require('../controllers/cumplimentar')
+let cumplimentar = require('../controllers/cumplimentar_controller')
+let coordinadorController = require('../controllers/coordinador_controller')
+let gruposController = require('../controllers/grupos_controller')
 
 
 router.get('/a', function (req, res) {
@@ -35,14 +37,14 @@ router.get('/Cumplimentar', permisosController.comprobarAdmins, function (req, r
   req.session.menu.push("drop_ProgDoc")
   req.session.menu.push("element_ProgDocCumplimentar")
   next()
-}, cumplimentar.getPlanes);
+}, cumplimentar.getPlanes, cumplimentar.getCumplimentar);
 //ruta para comprobar permisos para Asignar profesores(responsableDocente es principal)
-router.get('/Gestion', permisosController.comprobarAdmins, function (req, res) {
+router.get('/Gestion', permisosController.comprobarAdmins, function (req, res, next) {
   req.session.menu = [];
   req.session.menu.push("drop_ProgDoc")
   req.session.menu.push("element_ProgDocGestion")
-  res.redirect(app.contextPath+"AbrirCerrar")
-});
+  next()
+}, cumplimentar.getPlanes, cumplimentar.getGestion);
 
 //ruta para comprobar permsisos para Asignar Tribunales(solo responsableDocente por ahora)
 router.get('/AsignarTribunales', permisosController.comprobarResponsableDocenteODirectorOCoordinadorOSubDirectorPosgradoOJefeEstudios, function (req, res) {
@@ -75,16 +77,21 @@ router.get('/Historial', permisosController.comprobarAdmins, function (req, res)
 //router.get('/logout',permisosController.noreturnLogout);
 
 //rutads de resodic
-router.get("/respDoc/tribunales", respController.getProgramacionDocente, respController.getTribunales)
-router.get("/respDoc/editAsignacion", respController.edit)
-router.post("/respDoc/aprobarAsignacion", respController.aprobarAsignacion)
-router.post("/respDoc/guardarAsignacion", cumplimentar.anadirProfesor,respController.guardarAsignacion)
-router.post("/respDoc/aprobarTribunales", cumplimentar.anadirProfesor,respController.guardarTribunales, respController.aprobarTribunales)
-router.post("/respDoc/guardarTribunales", cumplimentar.anadirProfesor,respController.guardarTribunales, respController.reenviar)
-router.get("/respDoc/", respController.getProgramacionDocente, respController.get); 
+router.get("/respDoc/tribunales", cumplimentar.getProgramacionDocente, respController.getTribunales);
+router.get("/respDoc/editAsignacion", respController.edit);
+router.post("/respDoc/aprobarAsignacion", respController.aprobarAsignacion);
+router.post("/respDoc/guardarAsignacion", cumplimentar.anadirProfesor,respController.guardarAsignacion);
+router.post("/respDoc/aprobarTribunales", cumplimentar.anadirProfesor,respController.guardarTribunales, respController.aprobarTribunales);
+router.post("/respDoc/guardarTribunales", cumplimentar.anadirProfesor,respController.guardarTribunales, respController.reenviar);
+router.get("/respDoc/", cumplimentar.getProgramacionDocente, respController.get);
+router.get('/coordinador/horarios', cumplimentar.getProgramacionDocente, coordinadorController.getHorario);
+router.post('/coordinador/guardarHorarios', coordinadorController.guardarHorario);
+router.get('/grupos/getGrupos', cumplimentar.getProgramacionDocente, gruposController.getGrupos)
+router.get('/gestionGrupos/getGrupos', cumplimentar.getProgramacionDocente, gruposController.getGrupos)
+router.post('/gestionGrupos/guardarGruposJE', gruposController.EliminarGruposJE, gruposController.ActualizarGruposJE, gruposController.AnadirGruposJE )
 
-router.get("/AbrirCerrar", gestionController.gestionProgDoc)
-router.post("/abrirProgdoc", jefeController.abrirProgDoc)
+router.get("/AbrirCerrar", gestionController.gestionProgDoc);
+router.post("/abrirProgdoc", jefeController.abrirProgDoc);
 
 /*
 

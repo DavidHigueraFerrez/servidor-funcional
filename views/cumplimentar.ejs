@@ -3,7 +3,7 @@
     <p>Cumplimentar Programación</p>
     <div class="row col-sm space-above-below">
         <div clas="container">
-         <select id="selectPlan" class="selectpicker" onchange="cambiarPD()">
+         <select id="selectPlan" onchange="cambiarPD()">
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
                     <option value="<%=planEstudios[i].nombre%>"><%=planEstudios[i].nombre%></option> 
@@ -14,11 +14,11 @@
          </select>
         </div>
     </div>
-    <% if (locals.departamentoID && locals.departamentosResponsables) { %>
+    <% if (locals.departamentoID && locals.departamentosResponsables && (locals.submenu === "Profesores" || locals.submenu === "Tribunales")) { %>
      <input id='departamentoResponsable' type="hidden" value="<%=departamentoID%>">
      <div class="row col-sm space-above-below">
         <div clas="container">
-         <select id="selectDepartamento" class="selectpicker" onchange="cambiarDepart()">
+         <select id="selectDepartamento"  onchange="cambiarDepart()">
             <option value="<%=departamentoID%>"><%=departamentoID%></option>
             <% for(let i=0; i < departamentosResponsables.length; i++) { 
                  if (departamentosResponsables[i].codigo !== departamentoID){%>
@@ -83,7 +83,11 @@ function cambiarSubmenu(evt, submenu) {
         let url = "/progdoc/respDoc/tribunales?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
-    
+    if (submenu === 'Horarios'){
+        let url = "/progdoc/coordinador/horarios?planAcronimo="+pAcronimo
+        window.location.replace(url);
+    }
+
 }
 function cambiarPD(){
     let pAcronimo = document.getElementById("selectPlan").value;
@@ -131,7 +135,8 @@ function actualizarSelectyBarra() {
     document.getElementById('selectPlan').value = selectValue;
 
     let departamento = document.getElementById('departamento');
-    if(departamento){
+    let selectDepartamento = document.getElementById('selectDepartamento');
+    if(departamento && selectDepartamento){
         let selectDepartamentoValue = selectDepartamento.value;
         if(!selectDepartamentoValue){
             selectDepartamentoValue = "D520"
@@ -143,7 +148,6 @@ function actualizarSelectyBarra() {
     if(!submenu) {
         submenu= "Estado"
     }
-    console.log(submenu)
     document.getElementById(submenu).style.display = "block";
     document.getElementById(submenu).className += " active";
 }

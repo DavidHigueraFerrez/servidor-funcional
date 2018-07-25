@@ -207,6 +207,7 @@ exports.abrirProgDoc = function (req, res, next) {
                                 return models.Asignatura.findAll({
                                     where: whereAsignaturas,
                                     include: [{
+                                        //incluye las asignaciones de profesores y los horarios.
                                         model: models.AsignacionProfesor,
                                         //left join
                                     }],
@@ -318,8 +319,8 @@ exports.abrirProgDoc = function (req, res, next) {
                                                     if (tipoPD === "I" || (tipoPD === '1S' && asignBBDD.semestre !== '2S') || (tipoPD === '2S' && asignBBDD.semestre !== '1S')){
   
                                                         //console.log(asignBBDD);
-                                                        //las asignaciones con profesor a null las creo abajo no aqui
-                                                        if (asignBBDD["AsignacionProfesors.ProfesorId"]) {
+                                                        //las asignaciones con profesor y horario a null las creo abajo no aqui
+                                                        if (asignBBDD["AsignacionProfesors.ProfesorId"] || asignBBDD["AsignacionProfesors.Dia"]) {
                                                             //console.log(asignBBDD)
                                                             let asignacion = {};
                                                             let idGrupo = relacionGrupos.find(function (obj) { return obj.identificadorViejo === asignBBDD['AsignacionProfesors.GrupoId']; });
@@ -327,17 +328,39 @@ exports.abrirProgDoc = function (req, res, next) {
                                                                 asignacion.AsignaturaId = asignBBDD.codigo; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
                                                                 asignacion.GrupoId = idGrupo.identificadorNuevo;
                                                                 asignacion.ProfesorId = asignBBDD['AsignacionProfesors.ProfesorId']
+                                                                asignacion.Dia = asignBBDD['AsignacionProfesors.Dia']
+                                                                asignacion.HoraInicio = asignBBDD['AsignacionProfesors.HoraInicio']
+                                                                asignacion.Duracion = asignBBDD['AsignacionProfesors.Duracion']
                                                                 asignacions.push(asignacion);                                                                                                                   
                                                             }
 
                                                         }
-                                                        // en todos los grupos asignacion con un profesor a null, el minimo par que funcione luego en todos los grupos del curos. Se hace por si el curso cambia
+                                                        // en todos los grupos asignacion con un profesor a null y horario a null, el minimo par que funcione luego en todos los grupos del curso. Se hace por si el curso cambia
                                                         relacionGrupos.forEach(function (element, index) {
                                                             let asignacion = {}
-                                                            if (element.curso === Number(asignBBDD.curso)) {
+                                                            let condicion = true;
+                                                            switch (tipoPD) {
+                                                                case "1S":
+                                                                    condicion = true;
+                                                                    break;
+                                                                case "2S":
+                                                                    condicion = true;
+                                                                    break;
+                                                                case "I":
+                                                                //solo quiero asignarle los grupos de su semestre aunque sea anual
+                                                                    condicion = ((As.semestre !== '1S' && As.semestre !== '2S') || (As.semestre ===element.nombre.split(".")[1]+"S"))
+                                                                    break;
+                                                                default:
+                                                                    condicion = false;
+                                                                    break;
+                                                            }
+                                                            if (element.curso === Number(asignBBDD.curso) && condicion) {
                                                                 asignacion.AsignaturaId = asignBBDD.codigo; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
                                                                 asignacion.GrupoId = element.identificadorNuevo;
-                                                                asignacion.ProfesorId = null                   
+                                                                asignacion.ProfesorId = null 
+                                                                asignacion.Dia = null
+                                                                asignacion.HoraInicio = null;
+                                                                asignacion.Duracion = null;                  
                                                                 asignacions.push(asignacion);
                                                             }
                                                         })
@@ -353,7 +376,7 @@ exports.abrirProgDoc = function (req, res, next) {
 
                                         } else if (cursoCambio || semestreCambio || tipoCambio) {
                                             if (tipoPD === "I" || (tipoPD === '1S' && asignBBDD.semestre !== '2S') || (tipoPD === '2S' && asignBBDD.semestre !== '1S')) {
-                                                // las asignaturas que cambian en algo se meten todos los profesores en el primer grupo
+                                                // las asignaturas que cambian en algo se meten todos los profesores en el primer grupo y los horarios no se meten
                                                 let asignacion = {}
                                                 let primerGrupo = true;
                                                 if (asignBBDD["AsignacionProfesors.ProfesorId"]) {
@@ -361,13 +384,32 @@ exports.abrirProgDoc = function (req, res, next) {
                                                     asignacion.ProfesorId = asignBBDD['AsignacionProfesors.ProfesorId']
                                                 }
 
-                                                // en todos los grupos asignacion con un profesor a null, el minimo par que funcione luego en todos los grupos del curos. Se hace por si el curso cambia
+                                                // en todos los grupos asignacion con un profesor a null y el horario a null, el minimo par que funcione luego en todos los grupos del curos. Se hace por si el curso cambia
                                                 relacionGrupos.forEach(function (element, index) {
                                                     let asignacion2 = {}
-                                                    if (element.curso === Number(asignBBDD.curso)) {
+                                                    let condicion = true;
+                                                    switch (tipoPD) {
+                                                        case "1S":
+                                                            condicion = true;
+                                                            break;
+                                                        case "2S":
+                                                            condicion = true;
+                                                            break;
+                                                        case "I":
+                                                            //solo quiero asignarle los grupos de su semestre aunque sea anual
+                                                            condicion = ((As.semestre !== '1S' && As.semestre !== '2S') || (As.semestre === element.nombre.split(".")[1] + "S"))
+                                                            break;
+                                                        default:
+                                                            condicion = false;
+                                                            break;
+                                                    }
+                                                    if (element.curso === Number(asignBBDD.curso) && condicion) {
                                                         asignacion2.AsignaturaId = asignBBDD.codigo; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
                                                         asignacion2.GrupoId = element.identificadorNuevo;
                                                         asignacion2.ProfesorId = null
+                                                        asignacion2.Dia = null
+                                                        asignacion2.HoraInicio = null;
+                                                        asignacion2.Duracion = null;
                                                         asignacions.push(asignacion2);
                                                         if (asignacion.ProfesorId  && primerGrupo) {
                                                             asignacion.AsignaturaId = asignBBDD.codigo;
@@ -395,10 +437,11 @@ exports.abrirProgDoc = function (req, res, next) {
                                         }
 
 
-                                    }//asignación nueva
+                                    }//asignación nueva en una asignatura que ya meti
                                     else if (apiAsignaturas[asignBBDD.codigo] && viejaAsignatura) {
-                                        if (asignBBDD["AsignacionProfesors.ProfesorId"]) {
+                                        if (asignBBDD["AsignacionProfesors.ProfesorId"] || asignBBDD["AsignacionProfesors.Dia"]) {
                                             //console.log(asignBBDD)
+                                            //la asignacion es de profesor o horario
                                             let asignacion = {};
                                             //console.log(relacionGrupos)
                                             //console.log(asignBBDD)
@@ -407,11 +450,14 @@ exports.abrirProgDoc = function (req, res, next) {
                                                 asignacion.AsignaturaId = asignBBDD.codigo; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
                                                 asignacion.GrupoId = idGrupo.identificadorNuevo;
                                                 asignacion.ProfesorId = asignBBDD['AsignacionProfesors.ProfesorId']
+                                                asignacion.Dia = asignBBDD['AsignacionProfesors.Dia']
+                                                asignacion.HoraInicio = asignBBDD['AsignacionProfesors.HoraInicio']
+                                                asignacion.Duracion = asignBBDD['AsignacionProfesors.Duracion']
                                                 asignacions.push(asignacion);
                                             }
 
                                         }
-                                    } //asignatura que cambia de cuatrimestre o curso o tipo solo meto los profesores en el primer grupo y sin repetir
+                                    } //asignatura que cambia de cuatrimestre o curso o tipo solo meto los profesores en el primer grupo y sin repetirh y no meto horarios
                                     else if (apiAsignaturas[asignBBDD.codigo] && cambioAsignatura) {
                                         if (asignBBDD["AsignacionProfesors.ProfesorId"]) {
                                             //console.log(asignBBDD)
@@ -503,7 +549,23 @@ exports.abrirProgDoc = function (req, res, next) {
                                             nuevasAsignaturas.push(nuevaAsign);
                                             relacionGrupos.forEach(function (element, index) {
                                                 let asignacion = {}
-                                                if (element.curso === nuevaAsign.curso) {
+                                                let condicion = true;
+                                                switch (tipoPD) {
+                                                    case "1S":
+                                                        condicion = true;
+                                                        break;
+                                                    case "2S":
+                                                        condicion = true;
+                                                        break;
+                                                    case "I":
+                                                        //solo quiero asignarle los grupos de su semestre aunque sea anual
+                                                        condicion = ((nuevaAsign.semestre !== '1S' && nuevaAsign.semestre !== '2S') || (nuevaAsign.semestre === element.nombre.split(".")[1] + "S"))
+                                                        break;
+                                                    default:
+                                                        condicion = false;
+                                                        break;
+                                                }
+                                                if (element.curso === nuevaAsign.curso && condicion) {
                                                     asignacion.AsignaturaId = nuevaAsign.codigo; //este es el viejo después deberé de sustituirlo por el id nuevo no por el codigo el codigo para identificar
                                                     asignacion.GrupoId = element.identificadorNuevo;
                                                     asignacion.ProfesorId = null

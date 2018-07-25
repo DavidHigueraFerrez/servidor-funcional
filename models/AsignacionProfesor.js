@@ -8,6 +8,15 @@ module.exports = function (sequelize, DataTypes) {
                 primaryKey: true,
                 autoIncrement: true
             },
+            Dia: {
+                type: DataTypes.ENUM('L', 'M', 'X', 'J', 'V', 'S', 'D')
+            },
+            HoraInicio: {
+                type: DataTypes.TIME
+            },
+            Duracion: {
+                type: DataTypes.FLOAT
+            }
         },
         {
             timestamps: false

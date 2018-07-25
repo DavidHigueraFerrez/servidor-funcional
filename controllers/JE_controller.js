@@ -115,7 +115,8 @@ exports.gestionProgDoc = function (req, res, next) {
             abrirpath: "" + req.baseUrl +"/abrirProgdoc",
             cerrarpath: "" + req.baseUrl + "/cerrarProgdoc",
             submenu: req.session.submenu,
-            menu: req.session.menu
+            menu: req.session.menu,
+            planAcronimo: req.session.planAcronimo,
           })
     });
 }
