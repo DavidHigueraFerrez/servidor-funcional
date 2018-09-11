@@ -2,6 +2,7 @@ let app = require('../app')
 let models = require('../models');
 let Sequelize = require('sequelize');
 let estados = require('../estados');
+let funciones = require('../funciones');
 
 exports.getPlanes = function (req, res, next){
         models.PlanEstudio.findAll({
@@ -15,14 +16,27 @@ exports.getPlanes = function (req, res, next){
 
 exports.getProgramacionDocente = function (req, res, next) {
     let planAcronimo = req.query.planAcronimo;
+    if (!planAcronimo){
+        planAcronimo = req.session.planAcronimo
+    }
+    if(!planAcronimo){
+        planAcronimo = "GITST"
+    }
     let departamentoID = req.query.departamentoID;
+    //separar con un if el rol en el que el where afecta
+    let wherePD = {};
+    wherePD['$or'] = [];
+    wherePD['$or'].push({ estadoProGDoc: estados.estadoProgDoc.abierto});
+    wherePD['$or'].push({ estadoProGDoc: estados.estadoProgDoc.incidencia });
     if (departamentoID) {
         req.session.departamentoID = departamentoID;
+    }else{
+        req.session.departamentoID = "D520";
     }
     //el planAcronimo si no existe acronimo sera el código, por eso el or
     if (planAcronimo) {
         req.session.planAcronimo = planAcronimo
-        models.PlanEstudio.findOne({
+        models.PlanEstudio.findAll({
             attributes: ['nombre', 'codigo'],
             where: Sequelize.or(
                 { nombre: planAcronimo },
@@ -31,19 +45,35 @@ exports.getProgramacionDocente = function (req, res, next) {
             ,
             include: [{
                 model: models.ProgramacionDocente,
-                where: {
-                    estadoProGDoc: estados.estadoProgDoc.abierto
-                }
+                where:wherePD
             }],
             raw: true
         })
-            .then(function (param) {
-                res.locals.progDoc = param;
-                //console.log(param);
-                if (param) {
+            .then(function (params) {
+                let progDocIncidencia = null;
+                let progDocAbierta = null;
+                params.forEach(function (param){
+                    req.session.planCodigo = param['codigo'];
+                    req.session.pdID = param['ProgramacionDocentes.identificador']
+                    res.locals.pdSemestre = param['ProgramacionDocentes.semestre']
+                    switch (param['ProgramacionDocentes.estadoProGDoc']) {
+                        case estados.estadoProgDoc.abierto:
+                            progDocAbierta = param;
+                            break;
+                        case estados.estadoProgDoc.incidencia:
+                            progDocIncidencia = param;
+                            break;
+                    }
+                })
+                if(progDocIncidencia !== null){
+                    res.locals.progDoc = progDocIncidencia;
+                }else{
+                    res.locals.progDoc = progDocAbierta;
+                }                
+                if (res.locals.progDoc !== null) {
                     let query = 'SELECT distinct  "DepartamentoResponsable", public."Departamentos".nombre FROM public."Asignaturas" p  inner join public."Departamentos" on p."DepartamentoResponsable" = public."Departamentos".codigo WHERE p."ProgramacionDocenteIdentificador" = :pdId ';
                     return models.sequelize.query(query = query,
-                        { replacements: { pdId: param['ProgramacionDocentes.identificador'] } },
+                        { replacements: { pdId: res.locals.progDoc['ProgramacionDocentes.identificador'] } },
                     ).then(departamentosResponsables => {
                         let depResponsables = [];
                         departamentosResponsables[0].forEach(function (d) {
@@ -54,6 +84,9 @@ exports.getProgramacionDocente = function (req, res, next) {
                         })
                         if (depResponsables.length >= 0) {
                             res.locals.departamentosResponsables = depResponsables;
+                            if (!departamentoID) {
+                                req.session.departamentoID = depResponsables[0].codigo;
+                            }
                         }
 
                         next();
@@ -75,17 +108,50 @@ exports.getProgramacionDocente = function (req, res, next) {
 
 }
 
+exports.getGrupos = function (req, res, next) {
+    if(res.locals.progDoc){
+        let pdID = req.query.pdID ? req.query.pdID : res.locals.progDoc['ProgramacionDocentes.identificador']
+        models.Grupo.findAll({
+            attributes: ["nombre", "curso", "grupoId"],
+            where: { ProgramacionDocenteId: pdID },
+            order: [
+
+                [Sequelize.literal("curso"), 'ASC'],
+                [Sequelize.literal("nombre"), 'ASC']
+            ],
+            raw: true
+        }).then(function (grupos) {
+            res.locals.grupos = grupos;
+            next();
+        })
+    }else{
+        next();
+    }
+    
+}
+
 exports.getCumplimentar = function(req,res,next){
-    res.render('cumplimentar', {
-        menu: req.session.menu,
-        path: req.baseUrl,
-        planAcronimo: req.session.planAcronimo,
-        planEstudios: req.session.planEstudios
-    });
+    res.redirect(app.contextPath + "estado")
+}
+
+exports.getConsultar = function (req, res, next) {
+    res.redirect(app.contextPath + "consultar/estado")
 }
 
 exports.getGestion = function (req, res, next) {
     res.redirect(app.contextPath + "AbrirCerrar")
+}
+
+exports.getHistorial = function(req, res ,next){
+    res.render('historial', {
+        menu: req.session.menu,
+        planAcronimo: req.session.planAcronimo,
+        departamentosResponsables: res.locals.departamentosResponsables,
+        planEstudios: req.session.planEstudios,
+        PDsWithPdf: res.locals.PDsWithPdf,
+        anosExistentes: res.locals.anosExistentes,
+        pdSeleccionada: res.locals.pdSeleccionada
+    })
 }
 
 exports.anadirProfesor = function (req, res, next){
@@ -145,7 +211,9 @@ exports.anadirProfesor = function (req, res, next){
                 .each(function (profesor) {
                     let nombre = profesor['apellido'] + " " + profesor['nombre']
                     let correo = profesor['email']
-                    let prof = { nombre: nombre, correo: correo }
+                    let nombreCorregido = profesor['apellido'] + "," + profesor['nombre']
+                    nombreCorregido = funciones.primerasMayusc(nombreCorregido)
+                    let prof = { nombre: nombre, correo: correo, nombreCorregido: nombreCorregido }
                     req.session.profesores.push(prof);
 
                 }).then(() => {

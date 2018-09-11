@@ -6,7 +6,7 @@
   <!-- Despliegue -->
   <link rel='stylesheet' type="text/css" href='/progdoc/stylesheets/style.css' />
   <!-- Local -->
-  <!-- <link rel='stylesheet' href='../stylesheets/style.css' /> -->
+  <link rel='stylesheet' href='../stylesheets/style.css' /> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -23,7 +23,7 @@
      <i class="glyphicon glyphicon-plus fa fa-caret-down" aria-hidden="true"></i>
   </button>
   <div class="dropdown-container">
-    <a id='element_ProgDocConsulta' href="/progdoc/Consulta">Consulta</a>
+    <a id='element_ProgDocConsultar' href="/progdoc/Consultar">Consultar</a>
     <a id='element_ProgDocCumplimentar' href="/progdoc/Cumplimentar">Cumplimentar</a>
     <a id='element_ProgDocGestion' href="/progdoc/Gestion">Gestion</a>
     <a id='element_ProgDocHistorial' href="/progdoc/Historial">Historial</a>
@@ -92,7 +92,9 @@ menu.forEach(function(element,index){
   }
   });
 }
-
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1500}, placement: "auto"});   
+});
 </script>
 
 </body>

@@ -1,0 +1,9 @@
+<%- include cumplimentar.ejs %>
+<div>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
+<%}else{%>
+    <p><%=pdID%></p>
+<%}%>

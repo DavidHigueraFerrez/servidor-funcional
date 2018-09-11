@@ -1,0 +1,368 @@
+<!-- Local -->
+<script src="/js/autocomplete.js"></script>
+<!-- despliegue -->
+<script src="/progdoc/js/autocomplete.js"></script>
+<%- include gestion.ejs %>
+<h3>Gestion Roles Aplicacion</h3>
+<div class="container">
+    <div class="row col-sm space-above-below">
+        <span class="col-sm-4"></span>
+        <span class="col-sm-4"></span> 
+        <span class="col-sm-4"></span>
+    </div>
+    <% for(var i=0; i < roles.length; i++){ %>
+        <% if(roles[i].rol==="JefeEstudios"){  %>
+            <% for(var t=0; t < profesores.length; t++){ %>
+                <% if(roles[i].PersonaEmail === profesores[t].correo){ %>
+    <form id="<%=roles[i].rol %>" autocomplete="off" action="/gestionRoles/guardarRoles"  method="post" onsubmit="return Enviar()">
+    <div class="row col-sm space-above-below">
+        <div class="col-sm-3">Jefe De Estudios</div>
+        <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+            <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+            <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+            placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+         </div>
+        <div class="col-sm-3"><button type="button" onclick="Guardar('<%=roles[i].rol %>', '/guardarRoles')">Aprobar</button></div>
+    </div>
+    </form>
+                <% } %>
+            <% } %>
+        <% } %>
+        <%  if(roles[i].rol==="SubdirectorPosgrado"){ %>
+            <% for(var t=0; t < profesores.length; t++){ %>
+                <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+    <form id="<%=roles[i].rol %>">
+    <div class="row col-sm space-above-below">
+        <div class="col-sm-3">Subdirector de Posgrado</div>
+        <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+            <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+            <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+            placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+         </div>
+        <div class="col-sm-3"><button type="button" >Aprobar</button></div>
+    </div>
+    </form>
+                <% } %>
+            <% } %>
+        <% } %>
+        <% if(roles[i].rol==="SecretariaJefeEstudios"){ %>
+    <form id="<%=roles[i].rol %>">
+    <div class="row col-sm space-above-below">
+        <div class="col-sm-3">Secretaria Jefe De Estudios</div>
+        <div id='div_<%=roles[i].rol %>_<%=roles[i].PersonaEmail %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=roles[i].PersonaEmail %>')">
+            <p id='p_<%=roles[i].rol %>_<%=roles[i].PersonaEmail %>'><%=roles[i].PersonaEmail %></p>
+            <input id='<%=roles[i].rol %>_<%=roles[i].PersonaEmail %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=roles[i].PersonaEmail %>"
+            placeholder="<%=roles[i].PersonaEmail %>" class="col-sm-3"></input>
+         </div>
+        <div class="col-sm-3"><button type="button"  >Aprobar</button></div>
+    </div>
+    </form>
+        <% } %>
+    <% } %>
+    
+    <div class="row col-sm space-above-below">
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-4">Directores Departamentos</span>
+            </div>
+            <% for(var i=0; i < roles.length; i++) { %>
+                <% if(roles[i].DepartamentoCodigo==="D550"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de SSR</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Señales, Sistemas y Radiocomunicaciones</div>
+                <div class="col-sm-2"><button type="button" >Aprobar</button></div>
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D520"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de DIT</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Ingenieria y Sistemas Telematicos</div>
+                <div class="col-sm-2"><button type="button">Aprobar</button></div>
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D510"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de EIF</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Electronica Fisica, Ingenieria Electrica y Fisica Aplicada</div>
+                <div class="col-sm-2"><button type="button" >Aprobar</button></div> 
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D530"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de DIE</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Ingenieria Electronica</div>
+                <div class="col-sm-2"><button type="button">Aprobar</button></div>
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D560"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de TFB</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Tecnologia Fotonica y Bioingenieria</div>
+                <div class="col-sm-2"><button type="button" >Aprobar</button></div>
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D540"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de MAT</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Departamento Matematica Aplicada a las tecnologias de la informacion y las comunicaciones</div>
+                <div class="col-sm-2"><button type="button" >Aprobar</button></div>
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D240"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de LAT</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Linguistica Aplicada a la ciencia y la Tecnologia</div>
+                <div class="col-sm-2"><button type="button">Aprobar</button></div>
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+                <%  if(roles[i].DepartamentoCodigo==="D400"&&roles[i].rol==='DirectorDepartamento'){ %>
+                    <% for(var t=0; t < profesores.length; t++){ %>
+                        <% if(roles[i].PersonaEmail === profesores[t].correo){%>
+            <form id="<%=roles[i].rol %>_<%= roles[i].DepartamentoCodigo %>">
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-2">Director de IOR</div>
+                <div id='div_<%=roles[i].rol %>_<%=profesores[t].nombre %>' class="col-sm-3" onclick="mostrar('<%=roles[i].rol %>_<%=profesores[t].nombre %>')">
+                    <p id='p_<%=roles[i].rol %>_<%=profesores[t].nombre %>'><%=profesores[t].nombre %></p>
+                    <input id='<%=roles[i].rol %>_<%=profesores[t].nombre %>' type="hidden" name="noCambio" value="<%=roles[i].rol %>_<%=profesores[t].nombre %>"
+                    placeholder="<%=profesores[t].nombre %>" class="col-sm-3"></input>
+                </div>
+                <div class="col-sm-3">Ingenieria de Organizacion, Administracion de Empresas y Estadistica</div>
+                <di class="col-sm-2"><button type="button">Aprobar</button></di>   
+            </div>
+            </form>
+                        <% } %>
+                    <% } %>
+                <% } %>
+        <% } %>
+    </div>
+    <div class="row col-sm-12 space-above-below dropdown">
+            <div class="row col-sm space-above-below">
+                    <span class="col-sm-4">Responsables Docentes Titulacion</span>
+                    <span clas="col-sm-3">
+                    <select id="selectPlan" class="selectpicker" onchange="cambiarPD()">
+                        <option value='GITST'>GITST</option>
+                        <option value='GIB'>GIB</option>
+                        <option value='MUIT'>MUIT</option>
+                        <option value='MUTSC'>MUTSC</option>
+                        <option value='MUIRST'>MUIRST</option>
+                        <option value='MUEFSV'>MUEFSV</option>
+                        <option value='MUISE'>MUISE</option>
+                        <option value='MUIB'>MUIB</option>
+                        <option value='MUTECI'>MUTECI</option>
+                    </select>
+                </span>
+            
+            </div>
+            <div class="row col-sm space-above-below">
+                <div class="col-sm-1"> Coordinador</div>
+                <div class="col-sm-3"><input placeholder="escribir nombre"></input></div>
+                <div class="col-sm-3"><button>Aprobar</button></div>
+            </div>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <% if(roles[i].DepartamentoCodigo==="D550"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente SSR</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D520"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente DIT</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D510"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente EIF</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D530"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente DIE</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D560"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente TFB </span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D540"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente MAT</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D240"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente LAT</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+            <% for(var i=0; i < roles.length; i++) { %>
+            <%  if(roles[i].DepartamentoCodigo==="D400"&&roles[i].rol==='ResponsableDocente'){ %>
+            <div class="row col-sm space-above-below">
+                <span class="col-sm-3">Responsable Docente IOR</span>
+                <input placeholder="<%=roles[i]['Persona.nombre']+' '+roles[i]['Persona.apellido'] %>" class="col-sm-3"></input>
+                <span class="col-sm-3"><button>Aprobar</button></span>
+            </div>
+            <% }} %>
+    </div>
+</div> 
+
+<%- include nuevoProfesor.ejs %>
+<script>
+
+let profesores = <%-JSON.stringify(profesores)%>
+let profesores2 ="";
+
+profesores2 = quitAcents(profesores)
+
+function mostrar(id){
+  let celda = document.getElementById("div_"+id);
+  //debo hacer lo de p y p2 pq al aceptar en el buscador me vuelve a entrar aqui uso el id de p como flag 
+  let p = document.getElementById("p_"+id);
+  let p2 = document.getElementById("p_"+id+"_provisional")
+  let input = document.getElementById(id)
+  let nameInput = input.getAttribute('name');
+  if (p){
+    //creo el div para encapsular la busqueda
+    let div = document.createElement('div');
+    div.innerHTML = '<div class="autocomplete" style="width:500px;"></div>'
+    let nuevo = div.firstChild;
+    celda.appendChild(nuevo)
+    nuevo.appendChild(input)
+    celda.removeChild(p);
+    let nuevoValor = input.getAttribute('placeholder')
+    if (input.getAttribute('value')){
+      input.setAttribute('value', '' )
+    }
+    input.setAttribute('type', 'text')
+    autocomplete(input, profesores, profesores2, 'tribunales');
+  }else if(p2){
+    p2.setAttribute('id', "p_"+id);
+  }
+  input.focus();
+}
+function Volver(cancelarpath){
+  window.location.replace(cancelarpath);
+}
+function Guardar(formID,nuevopath){
+    let form2 = document.getElementById(formID);
+    form2.setAttribute('action', nuevopath);
+    console.log('entro');
+    form2.submit();
+}
+function cambiarPD(){
+    let pAcronimo = document.getElementById("selectPlan").value;
+    let search = parseQueryString();
+    delete search.pdID;
+    search.planAcronimo = pAcronimo;
+    let url = parseStringQuery(search);
+    window.location.replace(url);
+    
+}
+
+function Enviar(){
+  return confirm("Una vez aprobada la asignación de tribunales no podrá modificarla a menos que... ¿Seguro que quiere aprobarla?")
+}
+
+function Decidir(decision){
+  let dec = document.getElementById('decision');
+  dec.setAttribute('value', decision)
+  if(confirm("Esta acción no se podrá deshacer. ¿Está seguro de que quiere continuar?")){
+    document.getElementById("formDecision").submit();
+  }
+}
+</script>

@@ -1,11 +1,12 @@
 <!-- Local -->
-<!--<script src="/js/autocomplete.js"></script>-->
+<script src="/js/autocomplete.js"></script>
 <!-- despliegue -->
 <script src="/progdoc/js/autocomplete.js"></script>
 <div>
 <form id="asignacionCumplimentarForm" autocomplete="off" action="<%= nuevopath %>" method="post" >
 <input type="hidden" name="asignaturaId" value="<%= asign.identificador %>">
 <input type="hidden" name="pdID" value="<%= pdID %>">
+<input type="hidden" name="planAcronimo" value="<%= planAcronimo %>">
 <% if (asign.acronimo !== null){ %>
   <h1><%= asign.acronimo %></h1>
   <% }else{%>
@@ -15,7 +16,7 @@
 <ul style="list-style-type:none">
     <li>Coordinador:
     <div class="autocomplete" style="width:500px;">
-    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombre %>" placeholder="<%= asign.coordinador.nombre %>" onclick= 'LimpiaCoordinador()'>
+    <input id="coordinador" type="text" name="coordinador" value="<%= asign.coordinador.nombreCorregido %>" placeholder="<%= asign.coordinador.nombreCorregido %>" onclick= 'LimpiaCoordinador()'>
     </div> 
     </li>
     <% for(var i=0; i< asign.grupos.length; i++){ %>
@@ -24,7 +25,7 @@
       <ul style="list-style-type:none">
       <%for(var j=0; j< asign.grupos[i].profesors.length; j++){ %>
       <li id="asignacion_<%= asign.grupos[i].profesors[j].asignacion %>">
-      <%= asign.grupos[i].profesors[j].nombre %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
+      <%= asign.grupos[i].profesors[j].nombreCorregido %> <button type="button" onclick="Eliminar('asignacion_<%= asign.grupos[i].profesors[j].asignacion %>')">Eliminar</button>
       </li>
     <% } %>
     <div id = 'anadir_profesor_<%= asign.grupos[i].GrupoId %>'></div>

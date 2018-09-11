@@ -1,0 +1,82 @@
+<%- include consultar.ejs %>
+<div>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{%>
+            <% for (let i=0 ; i<grupos.length; i++){%>
+                <div>
+                    <h2>Curso <%= grupos[i].curso %></h2>
+                    <% for (let j=0 ; j<grupos[i].semestres.length; j++){%>
+                        <h3>Semestre <%= grupos[i].semestres[j].semestre %></h3>
+                        <div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Capacidad</th>
+                                    <th scope="col">Aula</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <% for (let k=0 ; k<grupos[i].semestres[j].grupos.length; k++){
+                                    if(!grupos[i].semestres[j].grupos[k].nombre.toUpperCase().includes("OPT")){
+                                    %>
+                                        <tr>
+                                        <td>
+                                        <%=grupos[i].semestres[j].grupos[k].nombre%>
+                                        </td>
+                                        <td>
+                                        
+                                        <% let capacidad = "0"
+                                        if (grupos[i].semestres[j].grupos[k].capacidad !== null) {
+                                            capacidad = grupos[i].semestres[j].grupos[k].capacidad
+                                        }%>
+                                        <%=capacidad%>
+                                        </td>
+                                        <td>
+                                        <% let aula = "Indefinida"
+                                        if (grupos[i].semestres[j].grupos[k].aula !== null && grupos[i].semestres[j].grupos[k].aula.trim() !== "") {
+                                        aula = grupos[i].semestres[j].grupos[k].aula
+                                        }%>
+                                        <%=aula%>
+                                        </td>
+                                        </tr>
+                                <%}
+                            }%>
+                                <%let gOptativas = grupos[i].semestres[j].grupos.find(function (obj) { return obj.nombre.toUpperCase().includes("OPT")});
+                                if (gOptativas){
+                                %>
+                                    <tr>
+                                    <td>
+                                    <%=gOptativas.nombre%>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    </tr> 
+                                <%}else{%>
+                                    <tr>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    </tr> 
+                                <%}%>
+                                </tbody>
+                            </table>
+                        </div>
+                    <%}%>
+                </div>
+
+            <%}%>
+    <%}%>
+
+</div>
+<script>
+
+
+
+</script>

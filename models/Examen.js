@@ -1,4 +1,5 @@
 // Definicion del modelo Examen:
+let enumsPD = require('../enumsPD');
 
 module.exports = function (sequelize, DataTypes) {
     let Examen = sequelize.define('Examen',
@@ -20,6 +21,13 @@ module.exports = function (sequelize, DataTypes) {
             },
             aulas: {
                 type: DataTypes.ARRAY(DataTypes.STRING)
+            },
+            //los periodos pueden ser ordinario o extraordinario y se separan tambien por semestre
+            //TODO cuando se defina el calendario se podrá acotar, lo único que igual hay que llamar a la clave como 
+            //la pd + el enum del tipo de periodo para no tener que cambiar muchas cosas
+            periodo:{
+                type: DataTypes.ENUM(enumsPD.periodoPD.S1_O, enumsPD.periodoPD.S1_E, enumsPD.periodoPD.S2_O, enumsPD.periodoPD.S2_E),
+                validate: { notEmpty: { msg: "Falta periodo" } }
             }
 
         },

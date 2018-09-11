@@ -67,7 +67,11 @@ module.exports = function (sequelize, DataTypes) {
             },                  
             archivo:{
                 type: DataTypes.JSONB
-            }
+            },
+            //uri donde se almacena el pdf al cerrar
+            HistorialID: {
+                type: DataTypes.STRING
+            },
         },
         {
             timestamps: false

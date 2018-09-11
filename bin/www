@@ -7,6 +7,7 @@
 let app = require('../app');
 let debug = require('debug')('portalalumno:server');
 let http = require('http');
+let local = app.local;
 
 /**
  * Get port from environment and store in Express.
@@ -25,9 +26,13 @@ let server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 //despliegue
+if(local === false){
 server.listen(port,'0.0.0.0');
-//local
-//server.listen(port);
+}else{
+  //local
+  server.listen(port);
+}
+
 server.on('error', onError);
 server.on('listening', onListening);
 

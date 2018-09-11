@@ -1,7 +1,6 @@
-    
-    <body>
-    <p>Cumplimentar Programación</p>
-    <div class="row col-sm space-above-below">
+<body>
+    <p>Consultar Programación</p>
+    <div class="row col-sm space-above-below" height="100%">
          <select id="selectPlan" onchange="cambiarPD()">
                 <% for(let i=0; i < planEstudios.length; i++) { 
                     if (planEstudios[i].nombre !== null){ %>
@@ -26,11 +25,12 @@
   <%}%>
     <div class="tab">
         <button id='Estado' class="tablinks" onclick="cambiarSubmenu(event, 'Estado')">Estado</button>
-        <!--<button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>-->
+        <button id='Grupos' class="tablinks" onclick="cambiarSubmenu(event, 'Grupos')">Grupos</button>
         <button id='Profesores' class="tablinks" onclick="cambiarSubmenu(event, 'Profesores')">Profesores</button>
         <button id='Tribunales' class="tablinks" onclick="cambiarSubmenu(event, 'Tribunales')">Tribunales</button>
         <button id='Horarios' class="tablinks" onclick="cambiarSubmenu(event, 'Horarios')">Horarios</button>
         <button id='Examenes' class="tablinks" onclick="cambiarSubmenu(event, 'Examenes')">Examenes</button>
+        <button id='PDF' class="tablinks" onclick="cambiarSubmenu(event, 'PDF')">PDF</button>
     </div>
     <% if (locals.planAcronimo) { %>
      <input id='plan' type="hidden" value="<%=planAcronimo%>">
@@ -68,26 +68,33 @@ function cambiarSubmenu(evt, submenu) {
     evt.currentTarget.className += " active";
     
     if(submenu === 'Profesores'){
-        let url = "/progdoc/respDoc/profesores?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "/progdoc/consultar/profesores?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Tribunales'){
-        let url = "/progdoc/respDoc/tribunales?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
+        let url = "/progdoc/consultar/tribunales?planAcronimo="+pAcronimo+"&departamentoID="+selectDepartamentoValue
         window.location.replace(url);
     }
     if (submenu === 'Horarios'){
-        let url = "/progdoc/coordinador/horarios?planAcronimo="+pAcronimo
+        let url = "/progdoc/consultar/horarios?planAcronimo="+pAcronimo
         window.location.replace(url);
     }
-    if (submenu === 'Examenes'){
-        let url = "/progdoc/coordinador/examenes?planAcronimo="+pAcronimo
+        if (submenu === 'PDF'){
+        let url = "/progdoc/consultar/PDF?planAcronimo="+pAcronimo
         window.location.replace(url);
     }
-    if (submenu === 'Estado'){
-        let url = "/progdoc/estado?planAcronimo="+pAcronimo
+        if (submenu === 'Examenes'){
+        let url = "/progdoc/consultar/examenes?planAcronimo="+pAcronimo
         window.location.replace(url);
     }
-
+        if (submenu === 'Estado'){
+        let url = "/progdoc/consultar/estado?planAcronimo="+pAcronimo
+        window.location.replace(url);
+    }
+        if (submenu === 'Grupos'){
+        let url = "/progdoc/consultar/grupos?planAcronimo="+pAcronimo
+        window.location.replace(url);
+    }
 
 }
 function cambiarPD(){
@@ -156,9 +163,3 @@ function actualizarSelectyBarra() {
 </script>
      
 </body>
-
-
-
-
-
-   

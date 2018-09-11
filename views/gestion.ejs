@@ -1,7 +1,7 @@
     
     <body>
     <p>Gestión</p>
-    <% if (locals.planAcronimo && locals.planEstudios && (locals.submenu === "Grupos")) { %>
+    <%if (locals.planAcronimo && locals.planEstudios && (locals.submenu === "Grupos")) { %>
     <div class="row col-sm space-above-below">
         <div clas="container">
          <select id="selectPlan" onchange="cambiarPD()">
@@ -59,11 +59,17 @@ function cambiarSubmenu(evt, submenu) {
         let url = "/progdoc/AbrirCerrar"
         window.location.replace(url);
     }
+   
     if (submenu === 'Grupos'){
     let url = "/progdoc/gestionGrupos/getGrupos?planAcronimo="+pAcronimo
     window.location.replace(url);
     } 
-
+    if (submenu === 'Roles'){
+    let url = "/progdoc/gestionRoles"
+    window.location.replace(url);
+    }
+    
+    
     
 }
 function cambiarPD(){

@@ -1,0 +1,155 @@
+<div>
+<% let getAsignaturaCodigo = function (codigo){
+  let found = asignaturas.find(function (obj) { return obj.identificador === codigo; });
+return found;
+}%>
+<% let getAsignaturaCodigoNombre = function (codigo){
+  let found = asignaturas.find(function (obj) { return obj.identificador === codigo; });
+  let nombreOAcronimo;
+  if (found){
+    if(found.acronimo !== null){ 
+        return found.acronimo;
+    }else{
+        return found.nombre
+    }    
+  }else{
+      return null;
+  }
+}%>
+
+<% let getNombre = function (correo){
+    let persona = profesores.find(function (obj) { return obj.correo === correo; });
+    if (persona){
+      return persona.nombre;
+    }else {
+      return "-"
+    }
+}%>
+<% let getNumeroGruposNoOptativas = function (grupos){
+  let found =grupos.filter(
+  //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+  grupo => (!grupo.nombre.toUpperCase().includes("OPT"))
+  );
+  return found.length;
+}%>
+
+
+<h2>2.Previsión de Grupos</h2>
+<p>La previsión de grupos de teoría por curso, es:</p>
+<% for(let i=0; i < cursosConGrupos.length; i++) { %>
+  <p>Curso <%=cursosConGrupos[i].curso%>:</p>
+  <ul>
+  <% for(let j=0; j < cursosConGrupos[i].semestres.length; j++) { %>
+      <li>Semestre <%=cursosConGrupos[i].semestres[j].semestre%>: <%=getNumeroGruposNoOptativas(cursosConGrupos[i].semestres[j].grupos)%> 
+      <%let text;
+      getNumeroGruposNoOptativas(cursosConGrupos[i].semestres[j].grupos) === 1 ? text = 'grupo' : text='grupos'%>
+      <%=text%>
+      </li>
+  <% } %>
+  </ul>
+<% } %>
+
+<h2>3.Horarios</h2>
+<p>La previsión de horarios por curso, es:</p>
+            <% for (let i=0 ; i<cursosConGrupos.length; i++){%>
+                <div>
+                    <p>Curso <%= cursosConGrupos[i].curso %></p>
+                    <% for (let j=0 ; j<cursosConGrupos[i].semestres.length; j++){%>
+                        <p>Semestre <%= cursosConGrupos[i].semestres[j].semestre %></p>
+                        <% for (let k=0 ; k<cursosConGrupos[i].semestres[j].grupos.length; k++){%>
+                            <% let getAsignacions = function (hora,dia){
+                                    let found = cursosConGrupos[i].semestres[j].grupos[k].horarios.filter(
+                                        //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                        asign => (asign.horaInicio && (asign.horaInicio.split(':')[0] === ""+l || asign.horaInicio.split(':')[0] === "0"+l) && asign.dia === dia)
+                                    );
+                                    return found;
+                            }%>
+                            <% let getNotas = function (){
+                                    let found = cursosConGrupos[i].semestres[j].grupos[k].horarios.filter(
+                                        //me devuelve 8 y la bbdd de datos 08 por eso lo de 0+l
+                                        asign => ((asign.nota && asign.nota.trim() !== ""))
+                                    );
+                                    return found;
+                            }%>
+                            <table>
+                              <caption style="text-align: left;">Grupo <%= cursosConGrupos[i].semestres[j].grupos[k].nombre %></caption>
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Hora</th>
+                                    <th scope="col">Lunes</th>
+                                    <th scope="col">Martes</th>
+                                    <th scope="col">Miércoles</th>
+                                    <th scope="col">Jueves</th>
+                                    <th scope="col">Viernes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <%  let l = 8;
+                                        while (l <= 20){ %> 
+                                    <tr>
+                                    <td scope="col"><%= ""+l+"-"+(l+1) %></td>
+                                    <% let dias = ['L','M','X','J','V'];
+                                        for(let d = 0; d<dias.length; d++){%>
+                                            <td scope="col">
+                                            <% let found = getAsignacions(l,dias[d])
+                                                if (found.length === 0){%>
+                                                    <span>-</span>
+                                                <%}
+                                                for (let m=0; m< found.length; m++){
+                                                  if(getAsignaturaCodigo(found[m].asignaturaId)){
+                                                    let asignat = getAsignaturaCodigo(found[m].asignaturaId)
+                                                    if(m>0){%>
+                                                        <span>/</span>
+                                                    <%}%> 
+                                                    <%if(asignat.acronimo !== null){ %>
+                                                        <%=asignat.acronimo%>
+                                                    <%} else{%>
+                                                        <%=asignat.nombre%>
+                                                    <% } %>
+                                                    </span>
+                                                  <%}
+                                                 } %>
+                                            </td>
+                                    <%}%>
+                                    </tr>
+                                    <% l++; }%>
+                                </tbody>
+                            </table>
+                            <div style="border: ridge  2px; padding: 0.5mm;" class="tableText">
+                                <p><b>Notas:</b></p>
+                                <% let foundNotas = getNotas();
+                                for (let n=0; n< foundNotas.length; n++){ %>
+                                    <p> 
+                                    <%if(getAsignaturaCodigo(foundNotas[n].asignaturaId)){
+                                    let asignat = getAsignaturaCodigo(foundNotas[n].asignaturaId) 
+                                    if(asignat.acronimo !== null){ %>
+                                        (<%=asignat.acronimo%>)
+                                    <%} else{%>
+                                        (<%=asignat.nombre%>)
+                                    <% } %>
+                                    
+                                    <%}%>
+                                    <%=foundNotas[n].nota%></p>
+                                <%}%>
+                            </div>
+                            <div style="border: ridge  2px; padding: 0.5mm;" class="tableText">
+                                <p><b>Profesores:</b></p>
+                                <% for(let l = 0; l<cursosConGrupos[i].semestres[j].grupos[k].asignaturas.length; l++){
+                                    let asignat = cursosConGrupos[i].semestres[j].grupos[k].asignaturas[l];%>
+                                    <p><b><%=getAsignaturaCodigoNombre(asignat.AsignaturaId)%>:</b>
+                                    <% for(let m = 0; m<asignat.asignacions.length; m++){
+                                        if(m === asignat.asignacions.length -1 ){%>
+                                            <span><%=getNombre(asignat.asignacions[m])%></span>
+                                        <%}else{%>     
+                                            <span><%=getNombre(asignat.asignacions[m])%>; </span>
+                                        <%}
+                                }%>
+                                    </p>                 
+                                <%}%>
+                            </div>
+                        <%}
+                    }%>
+                </div>
+
+            <%}%>
+</div>

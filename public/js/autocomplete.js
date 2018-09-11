@@ -44,6 +44,7 @@ function autocomplete(inp, obj, obj2, opcion) {
                 /*create a DIV element for each matching element:*/
                 let objeto = obj2[i]
                 let nombre = obj[i]['nombre']
+                let nombreCorregido = obj[i]['nombreCorregido']
                 b = document.createElement("DIV");
                 /*make the matching letters bold:*/
                 b.innerHTML = obj[i]['nombre'];
@@ -71,7 +72,7 @@ function autocomplete(inp, obj, obj2, opcion) {
                         inp.setAttribute("value", nuevoValor )
                         //creo div para despues quedarme con el elemento que contiene y poder utilizr innerHTML
                         let div = document.createElement('div');
-                        div.innerHTML = '<li id="list_' + idList + '">' + nombre + '<button type="button" onclick="Eliminar2(' + idList +')">Eliminar</button></li>'
+                        div.innerHTML = '<li id="list_' + idList + '">' + nombreCorregido + '<button type="button" onclick="Eliminar2(' + idList +')">Eliminar</button></li>'
                         let nuevo = div.firstChild;
                         abuelo.appendChild(nuevo);
                         abuelo.appendChild(inp);
@@ -92,7 +93,7 @@ function autocomplete(inp, obj, obj2, opcion) {
                         inp.setAttribute("value", nuevoValor)
                         //creo div para despues quedarme con el elemento que contiene y poder utilizr innerHTML
                         let div = document.createElement('div');
-                        div.innerHTML = '<p id="p_tribunal_'+tribunalId+'_'+puesto+'_provisional">'+nombre+'</p>'
+                        div.innerHTML = '<p id="p_tribunal_'+tribunalId+'_'+puesto+'_provisional">'+nombreCorregido+'</p>'
                         let nuevo = div.firstChild;
                         abuelo.appendChild(nuevo);
                         abuelo.appendChild(inp);

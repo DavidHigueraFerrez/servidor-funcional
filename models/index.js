@@ -1,4 +1,5 @@
 let path = require('path');
+let app = require('../app')
 
 
 // Cargar ORM
@@ -6,10 +7,15 @@ let Sequelize = require('sequelize');
 
 //    DATABASE_URL = postgres://user:passwd@host:port/database
 
-//despliegue
-let sequelize = new Sequelize('postgres://crm:1234@localhost:5432/gestiondocente');
-//local
-//let sequelize = new Sequelize('postgres://postgres:1234@localhost:5432/GestionDocente');
+let sequelize;
+if(app.local === false){
+    //despliegue
+    sequelize = new Sequelize('postgres://crm:1234@localhost:5432/gestiondocente');
+}else{
+    //local
+     sequelize = new Sequelize('postgres://postgres:1234@localhost:5432/GestionDocente');
+}
+
 
 
 // Importar la definicion de las tablas 
@@ -17,7 +23,6 @@ let Departamento = sequelize.import(path.join(__dirname, 'Departamento'));
 let Asignatura = sequelize.import(path.join(__dirname, 'Asignatura'));
 let Examen  = sequelize.import(path.join(__dirname,'Examen'));
 let Grupo = sequelize.import(path.join(__dirname, 'Grupo'));
-let Historial = sequelize.import(path.join(__dirname, 'Historial'));
 let Persona = sequelize.import(path.join(__dirname, 'Persona'));
 let PlanEstudio = sequelize.import(path.join(__dirname, 'PlanEstudio'));
 let Profesor = sequelize.import(path.join(__dirname, 'Profesor'));
@@ -116,13 +121,14 @@ ProgramacionDocente.belongsTo(PlanEstudio, { foreignKey: 'PlanEstudioId' });
 ProgramacionDocente.hasMany(Asignatura);
 Asignatura.belongsTo(ProgramacionDocente);
 
-// Relacion 1 a 1 entre Historial y Programación Docente: estan en tablas distintas pq la PD se puede borrar pero el historial no. 
-//Importante el orden de la relación pq sino te cargas a historial al cargarte a PD
-Historial.hasOne(ProgramacionDocente, { foreignKey: 'HistorialID' });
 
-//Relación N a N entre departamento y plan de estudios
-PlanEstudio.belongsToMany(Departamento, { through: 'Rol' });
-Departamento.belongsToMany(PlanEstudio, { through: 'Rol' });
+//Relación 1 a N entre PlanEstudio y rol
+PlanEstudio.hasMany(Rol)
+Rol.belongsTo(PlanEstudio)
+
+//Relación 1 a N entre Departamento y rol
+Departamento.hasMany(Rol)
+Rol.belongsTo(Departamento)
 
 //Relación 1 a N entre persona y rol
 Persona.hasMany(Rol)
@@ -155,7 +161,7 @@ Asignatura.belongsTo(Profesor, { as: 'Suplente', foreignKey: 'SuplenteTribunalAs
 
 
 
-//Crear tablas pendientes
+//Crear tablas pendientes TODO: quitar esto cuando esté todo.
 sequelize.sync();
 
 //Exportamos modelos
@@ -168,7 +174,6 @@ exports.Grupo = Grupo; // exportar definición de tabla Grupo
 exports.PlanEstudio = PlanEstudio; // exportar definición de tabla PlanEstudio
 exports.ProgramacionDocente = ProgramacionDocente; // exportar definición de tabla ProgramacionDocente
 exports.Examen = Examen; // exportar definición de tabla Examen
-exports.Historial = Historial; // exportar definición de tabla Historial
 exports.Rol = Rol; //exportar definición de tabla Rol
 exports.Itinerario = Itinerario; //exportar definición de tabla Itinerario
 exports.sequelize = sequelize;

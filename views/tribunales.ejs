@@ -1,13 +1,15 @@
 <!-- Local -->
-<!--<script src="/js/autocomplete.js"></script>-->
+<script src="/js/autocomplete.js"></script>
 <!-- despliegue -->
 <script src="/progdoc/js/autocomplete.js"></script>
 <%- include cumplimentar.ejs %>
 <div>
 <% if (locals.estado && locals.estado !== null) { %>
   <p><%=estado%></p>
+<%}else if(locals.permisoDenegado && locals.permisoDenegado !== null){%>
+  <p><%=permisoDenegado%></p>
 <%}else{
-  if(estadoTribunales[departamentoID] === 1) {%>
+  if(estadoTribunales[departamentoID] === estadosTribunal.abierto || estadoProgDoc === estadosProgDoc.incidencia) {%>
 <form id="formulario" autocomplete="off" action="<%= aprobarpath %>" method="post" onsubmit="return Enviar()" >
 <input type="hidden", name="pdID", value='<%= pdID %>'>
 <input type="hidden", name="departamentoID", value='<%=departamentoID%>'>
@@ -62,9 +64,11 @@
 <% } %> 
   </tbody>
 </table>
+<%if(estadoTribunales[departamentoID] === estadosTribunal.abierto && estadoProgDoc === estadosProgDoc.abierto) {%>
 <input type="submit" value='Guardar y Aprobar Asignación Tribunales'>
-<button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
+<%}%>
 <button type="button" onclick="Guardar('<%= nuevopath %>')">Guardar Cambios</button>
+<button type="button" onclick="Volver('<%= cancelarpath %>')">Cancelar</button>
 </form>
 <% }else{ %>
 <table class="table">
@@ -112,7 +116,7 @@
   </tbody>
 </table>
 <% } %>
-    <% if(estadoTribunales[departamentoID] === 2) { %>
+    <% if(estadoTribunales[departamentoID] === estadosTribunal.aprobadoResponsable && estadoProgDoc === estadosProgDoc.abierto) { %>
     <form id="formDecision" action="<%= aprobarpath %>" method="post">
     <input type="hidden" name="pdID" value='<%= pdID %>'>
     <input id="decision" type="hidden" name="decision" value='aceptar'>
@@ -132,7 +136,7 @@ let profesores = <%-JSON.stringify(profesores)%>
 let profesores2 ="";
 if(estado === null){
   
-  //console.log(profesores)
+  console.log(profesores)
   profesores2 = quitAcents(profesores)
   //document.getElementsByTagName('body')[0].onload = changeSelect();
 }

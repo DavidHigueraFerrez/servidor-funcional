@@ -21,3 +21,13 @@ exports.estadoHorario = {
     abierto: 1,
     aprobadoCoordinador: 2
 }
+
+exports.estadoExamen = {
+    abierto: 1,
+    aprobadoCoordinador: 2
+}
+
+exports.estadoCalendario = {
+    abierto: 1
+    
+}

@@ -16,6 +16,9 @@ module.exports = function (sequelize, DataTypes) {
             },
             Duracion: {
                 type: DataTypes.FLOAT
+            },
+            Nota: {
+                type: DataTypes.TEXT
             }
         },
         {

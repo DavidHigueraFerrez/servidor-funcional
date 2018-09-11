@@ -8,10 +8,12 @@ let estados = require('../estados');
 
 exports.getGrupos = function (req, res, next) {
     req.session.submenu = "Grupos"
+    let view = req.originalUrl.toLowerCase().includes("/consultar/") ? "gruposConsultar" : "gruposJE"
     //si no hay progDoc o no hay departamentosResponsables de dicha progDoc
     if (!res.locals.progDoc || !res.locals.departamentosResponsables) {
-        res.render("gruposJE", {
+        res.render(view, {
             estado: "Programacion docente no abierta",
+            permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
             planAcronimo: req.session.planAcronimo,
@@ -20,9 +22,12 @@ exports.getGrupos = function (req, res, next) {
             grupos: null
         })
     }
-    else if (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoHorarios'] && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoHorarios']) {
+    //hay que comprobar que no sea una url de consultar.
+    else if (estados.estadoProgDoc.abierto !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc'] && estados.estadoProgDoc.listo !== res.locals.progDoc['ProgramacionDocentes.estadoProGDoc']
+        && !req.originalUrl.toLowerCase().includes("/consultar/")) {
         res.render("gruposJE", {
             estado: "Programacion docente no abierta",
+            permisoDenegado: res.locals.permisoDenegado,
             menu: req.session.menu,
             submenu: req.session.submenu,
             planAcronimo: req.session.planAcronimo,
@@ -75,8 +80,9 @@ exports.getGrupos = function (req, res, next) {
                     //console.log(cursosConGrupos);
                     //console.log(cursosConGrupos[0].semestres[0])
                     let nuevopath = "" + req.baseUrl + "/gestionGrupos/guardarGruposJE"
-                    res.render("gruposJE", {
+                    res.render(view, {
                         estado: null,
+                        permisoDenegado: res.locals.permisoDenegado,
                         menu: req.session.menu,
                         submenu: req.session.submenu,
                         nuevopath: nuevopath,
@@ -98,7 +104,7 @@ exports.EliminarGruposJE = function (req, res, next) {
     let pdID = req.body.pdID;
     let toEliminar = req.body.eliminar;
     let promises = [];
-    if (toEliminar) {
+    if (toEliminar && !res.locals.permisoDenegado) {
         let whereEliminar = {};
         let whereEliminar2 = {};
         if (!Array.isArray(toEliminar)) {
@@ -129,7 +135,7 @@ exports.EliminarGruposJE = function (req, res, next) {
             })
         })
 
-    } if (!toEliminar) {
+    } else{
         next();
     }
 }
@@ -140,7 +146,7 @@ exports.ActualizarGruposJE = function (req, res, next) {
     let pdID = req.body.pdID;
     let toActualizar = req.body.actualizar;
     let promises = [];
-    if (toActualizar) {
+    if (toActualizar && !res.locals.permisoDenegado) {
         if (!Array.isArray(toActualizar)) {
             let grupoId = Number(toActualizar.split("_")[1])
             let nombre = toActualizar.split("_")[2]
@@ -186,13 +192,15 @@ exports.AnadirGruposJE = function (req, res, next) {
     let pdID = req.body.pdID;
     let toAnadir = req.body.anadir;
     let gruposToAnadir = [];
-    let asignacionsToAnadir = [];
-    if (toAnadir) {
+    if (toAnadir && !res.locals.permisoDenegado) {
         if (!Array.isArray(toAnadir)) {
             let nombre = toAnadir.split("_")[2];
             let newGrupo = {};
             newGrupo.nombre = nombre;
             newGrupo.capacidad = Number(req.body['grupo_' + nombre + '_capacidad']);
+            if (isNaN(newGrupo.capacidad)) {
+                newGrupo.capacidad = null
+            }
             newGrupo.curso = Number(toAnadir.split("_")[3]);
             newGrupo.aula = req.body['grupo_' + nombre + '_aula'];
             newGrupo.ProgramacionDocenteId = pdID;
@@ -203,61 +211,24 @@ exports.AnadirGruposJE = function (req, res, next) {
                 let newGrupo = {};
                 newGrupo.nombre = nombre;
                 newGrupo.capacidad = Number(req.body['grupo_' + nombre + '_capacidad']);
+                if (isNaN(newGrupo.capacidad)) {
+                    newGrupo.capacidad = null
+                }
                 newGrupo.curso = Number(element.split("_")[3]);
                 newGrupo.aula = req.body['grupo_' + nombre + '_aula'];
                 newGrupo.ProgramacionDocenteId = pdID;
                 gruposToAnadir.push(newGrupo)
             });
         }
-    } else {
-
-    }
-    models.Grupo.bulkCreate(
-        gruposToAnadir
-    ).then(() => {
-        return models.Grupo.findAll({
-            attributes: ["grupoId", "nombre", "curso"],
-            where: {
-                ProgramacionDocenteId: pdID
-            },
-            raw: true
-        }).then((grupos) => {
-            return models.Asignatura.findAll({
-                where: { ProgramacionDocenteIdentificador: pdID },
-                raw: true
-
-            }).each(function (asignBBDD) {
-                gruposToAnadir.forEach(function (g) {
-                    let grupoBBDD = grupos.find(function (obj) { return obj.nombre === g.nombre; });
-                    let condicion2 = false;
-                    switch (asignBBDD.semestre) {
-                        case "1S":
-                            condicion2 = Number(g.nombre.split(".")[1]) === 1 ? true : false;
-                            break;
-                        case "2S":
-                            condicion2 = Number(g.nombre.split(".")[1]) === 2 ? true : false;
-                            break;
-                        default:
-                            condicion2 = true;
-                            break;
-                    }
-                    if (Number(grupoBBDD.curso) === Number(asignBBDD.curso) && condicion2) {
-                        let nuevaAsignacion = {};
-                        nuevaAsignacion.AsignaturaId = asignBBDD.identificador;
-                        nuevaAsignacion.GrupoId = grupoBBDD.grupoId
-                        asignacionsToAnadir.push(nuevaAsignacion);
-                    }
-
-                })
-            }).then(() => {
-                models.AsignacionProfesor.bulkCreate(
-                    asignacionsToAnadir
-                ).then(() => {
-                    res.redirect("" + req.baseUrl + "/gestionGrupos/getGrupos?planAcronimo=" + planAcronimo)
-                })
-            })
+        models.Grupo.bulkCreate(
+            gruposToAnadir
+        ).then(() => {
+            res.redirect("" + req.baseUrl + "/gestionGrupos/getGrupos?planAcronimo=" + planAcronimo)
         })
-    })
+    } else {
+        res.redirect("" + req.baseUrl + "/gestionGrupos/getGrupos?planAcronimo=" + planAcronimo)
+    }
+
 }
 
 

@@ -1,0 +1,56 @@
+<div>
+<% let getAsignaturas = function (curso,semestre){
+  let found = asignaturas.filter(
+      //devuelve las asignaturas de un curso y semestre
+    asign => (Number(asign.curso) === Number(curso)&& (asign.semestre === semestre+"S" || asign.semestre === '1S-2S'))
+  );
+return found;
+}%>
+<% let getNombre = function (correo){
+    let persona = profesores.find(function (obj) { return obj.correo === correo; });
+    if (persona){
+      return persona.nombre;
+    }else {
+      return "-"
+    }
+}%>
+
+<h2>1.Asignaturas</h2>
+<% for(let i=0; i < cursosConGrupos.length; i++) { %>
+  <p>Curso <%=cursosConGrupos[i].curso%></p>
+  <% for(let j=0; j < cursosConGrupos[i].semestres.length; j++) { %>
+    <p>Semestre <%=cursosConGrupos[i].semestres[j].semestre%></p>
+    <% let asignaturasEncontradas = getAsignaturas(cursosConGrupos[i].curso,cursosConGrupos[i].semestres[j].semestre) %>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Semestre</th>
+            <th scope="col">Asignatura</th>
+            <th scope="col">Acrónimo</th>
+            <th scope="col">ECTS</th>
+            <th scope="col">Coordinador</th>
+            <th scope="col">Presidente</th>
+            <th scope="col">Vocal</th>
+            <th scope="col">Secretario</th>
+          </tr>
+        </thead>
+        <tbody>
+        <% for (let k=0; k< asignaturasEncontradas.length; k++){ %>
+          <tr>
+            <td><%=asignaturasEncontradas[k].codigo%></td>
+            <td><%=asignaturasEncontradas[k].semestre%></td>
+            <td><%=asignaturasEncontradas[k].nombre%></td>
+            <td><%=asignaturasEncontradas[k].acronimo%></td>
+            <td><%=asignaturasEncontradas[k].creditos%></td>
+            <td><%=getNombre(asignaturasEncontradas[k].CoordinadorAsignatura)%></td>
+            <td><%=getNombre(asignaturasEncontradas[k].PresidenteTribunalAsignatura)%></td>
+            <td><%=getNombre(asignaturasEncontradas[k].VocalTribunalAsignatura)%></td>
+            <td><%=getNombre(asignaturasEncontradas[k].SecretarioTribunalAsignatura)%></td>
+          </tr>
+        <% } %>
+        </tbody>
+      </table>
+  <% } %>
+<% } %>
+</div>

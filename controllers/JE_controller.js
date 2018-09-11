@@ -6,6 +6,8 @@ let mail = require('../mail/mail');
 const op = Sequelize.Op;
 let estados = require('../estados');
 const axios = require('axios');
+
+//TODO: manejar tiempo de sesion
 //concurrencia de tipo A-->B-->C--> 
 //                                 ----->F
 //                     D--->E----->   
@@ -14,7 +16,10 @@ exports.gestionProgDoc = function (req, res, next) {
     let nuevosPlanes = [];
     let planes = [];
     let pds = [];
+    //las susceptibles a incidencia son las anteriores. Lo importante es el orden. La unica excepcion es si la pd está cerrada o en incidencia que esta es la anterior
+    let pdsAnteriores = [];
     let promises = [];
+    let promises2 = [];
     let anos = [];
     let promise1 = axios.get('https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/9/departamentos')
         .then(function (response) {
@@ -52,7 +57,7 @@ exports.gestionProgDoc = function (req, res, next) {
         //obtengo las pd abiertas o con incidencias
         let apiPlanes = response.data;
         return models.PlanEstudio.findAll({
-            attributes: ["codigo", "nombre"],
+            attributes: ["codigo", "nombre", "nombreCompleto"],
             raw: true
         }).then(function (planesBBDD) {
             apiPlanes.forEach(function(apiPlan){
@@ -71,15 +76,38 @@ exports.gestionProgDoc = function (req, res, next) {
             return models.PlanEstudio.bulkCreate(
                 nuevosPlanes
             ).then(() => {
-                //¿Podría marcar una incidencia con algo ya abierto ¿? Si es así cambiar esto. Obtengo la ultima pd
-                // el order by es la clave si ya abrí una anual no voy a poder abrir una semestral después. Debe seguir el orden
-                return models.sequelize.query(query = 'SELECT   "PlanEstudioId", "identificador", "semestre", "anoAcademico", "estadoProGDoc" FROM public."ProgramacionDocentes" p   ORDER BY p."identificador" DESC ', 
+                //la incidencia se marca sobre la pd anterior (no la versión anterior)
+                return models.sequelize.query(query = 'SELECT  * FROM public."ProgramacionDocentes" p   ORDER BY p."identificador" DESC ', 
                 ).then(pdsBBDD => {
                     pdsBBDD[0].forEach(function (pdBBDD){
                         let existentePD = pds.find(function (obj) { return obj.PlanEstudioId === pdBBDD.PlanEstudioId });
                         if (!existentePD) {
                             pds.push({ PlanEstudioId: pdBBDD.PlanEstudioId, identificador:pdBBDD.identificador, estadoProGDoc: pdBBDD.estadoProGDoc, 
                                 anoAcademico: pdBBDD.anoAcademico, siguienteAnoAcademico: siguienteAnoAcademico(pdBBDD.anoAcademico), semestre: pdBBDD.semestre, });
+                            //TODO: cuando se añadan las otras funciones hay que ponerlas aquí
+                            //para comprobar si la pd se puede marcar como lista para que el jefe de estudios la cierre
+                            //aqui lo hago por si manualmente cambio algo de las otras partes para que al acceder a gestión cambie
+                            if (pdBBDD['estadoProGDoc'] === estados.estadoProgDoc.abierto
+                                && CumpleTodos(estados.estadoProfesor.aprobadoDirector, pdBBDD['estadoProfesores'])
+                                && CumpleTodos(estados.estadoTribunal.aprobadoDirector, pdBBDD['estadoTribunales'])
+                                && pdBBDD['estadoHorarios'] === estados.estadoHorario.aprobadoCoordinador
+                                && prog['estadoExamenes'] === estados.estadoExamen.aprobadoCoordinador
+                            ) {
+                                promises2.push(models.ProgramacionDocente.update(
+                                    { estadoProGDoc: estados.estadoProgDoc.listo }, /* set attributes' value */
+                                    { where: { identificador: pdBBDD.identificador } } /* where criteria */
+                                ).then(()=> {console.log("bbbb")}))
+                            }
+                            
+                        }else{
+                            let existentePDAnterior = pdsAnteriores.find(function (obj) { return obj.PlanEstudioId === pdBBDD.PlanEstudioId  });
+                            //solo habrá una pd susceptible de incidencia como mucho y no debe coincidir con el mismo año o semestre, esto es por si hay varias versiones. Además si la pdActual está cerrada o incidencia ya será la pdActual la de incidencia
+                            if (!existentePDAnterior && (pdBBDD.anoAcademico !== existentePD.anoAcademico || pdBBDD.semestre !== existentePD.semestre) && existentePD.estadoProgDoc !== estados.estadoProgDoc.cerrado && existentePD.estadoProgDoc !== estados.estadoProgDoc.incidencia) {
+                                pdsAnteriores.push({
+                                    PlanEstudioId: pdBBDD.PlanEstudioId, identificador: pdBBDD.identificador, estadoProGDoc: pdBBDD.estadoProGDoc,
+                                    anoAcademico: pdBBDD.anoAcademico, semestre: pdBBDD.semestre,
+                                });
+                            }
                         }
                     })
                     // puede haber planes sin pd, como los nuevos planes u otras cosas
@@ -87,9 +115,10 @@ exports.gestionProgDoc = function (req, res, next) {
                         let existentePD = pds.find(function (obj) { return obj.PlanEstudioId === plan.codigo });
                         if(existentePD){
                             existentePD.nombre = plan.nombre;
+                            existentePD.nombreCompleto = plan.nombreCompleto;
                         }
                         else{
-                            pds.push({PlanEstudioId:plan.codigo, identificador: null, estadoProGDoc: estados.estadoProgDoc.cerrado, nombre: plan.nombre, 
+                            pds.push({PlanEstudioId:plan.codigo, identificador: null, estadoProGDoc: estados.estadoProgDoc.cerrado, nombre: plan.nombre, nombreCompleto: plan.nombreCompleto, 
                                 anoAcademico: null, siguienteAnoAcademico:null, semestre:null }) //estado cerrado en caso de que no haya ninguan pd en el sistema
                         }
                     })
@@ -107,17 +136,31 @@ exports.gestionProgDoc = function (req, res, next) {
     promises.push(promise1);
     promises.push(promise2);
     return Promise.all(promises).then(() => {
-        res.render("abrirCerrarPds", {
-            planes: planes,
-            pds: pds, estadosProgDoc: estados.estadoProgDoc,
-            anos: anos,
-            consultarpath: "",
-            abrirpath: "" + req.baseUrl +"/abrirProgdoc",
-            cerrarpath: "" + req.baseUrl + "/cerrarProgdoc",
-            submenu: req.session.submenu,
-            menu: req.session.menu,
-            planAcronimo: req.session.planAcronimo,
-          })
+        console.log(promises2)
+        return Promise.all(promises2).then(()=>{
+            //si cambie alguna asignatura por el caso ese raro se deberá volver para obtener los datos.
+            if(promises2.length > 0){
+                res.redirect("" + req.baseUrl + "/AbrirCerrar")
+            }else{
+                res.render("abrirCerrarPds", {
+                    planes: planes,
+                    pds: pds,
+                    permisoDenegado: res.locals.permisoDenegado,
+                    pdsAnteriores: pdsAnteriores,
+                    estadosProgDoc: estados.estadoProgDoc,
+                    anos: anos,
+                    consultarpath: "",
+                    abrirpath: "" + req.baseUrl + "/abrirProgDoc",
+                    cerrarpath: "" + req.baseUrl + "/cerrarProgDoc",
+                    abririncidenciapath: "" + req.baseUrl + "/abrirIncidenciaProgDoc",
+                    cerrarincidenciapath: "" + req.baseUrl + "/cerrarIncidenciaProgDoc",
+                    submenu: req.session.submenu,
+                    menu: req.session.menu,
+                    planAcronimo: req.session.planAcronimo,
+                })
+            }
+
+        })
     });
 }
 
@@ -126,4 +169,145 @@ function siguienteAnoAcademico(anoActual) {
     let siguiente = year + 1;
     let siguiente2 = year + 2;
     return ("" + siguiente + "" + siguiente2.toString().substr(-2));
+}
+
+//TODO: cuando se añadan las otras funciones hay que ponerlas aquí
+//para comprobar si la pd se puede marcar como lista para que el jefe de estudios la cierre
+exports.isPDLista = function(progID, thenFunction){
+    return models.ProgramacionDocente.findOne(
+        { 
+            where: { identificador: progID },
+            raw: true
+     })
+    .then(function (prog) {
+        if (prog['estadoProGDoc'] === estados.estadoProgDoc.abierto
+         &&CumpleTodos(estados.estadoProfesor.aprobadoDirector, prog['estadoProfesores'])
+         && CumpleTodos(estados.estadoTribunal.aprobadoDirector, prog['estadoTribunales'])
+         && prog['estadoHorarios'] === estados.estadoHorario.aprobadoCoordinador
+         && prog['estadoExamenes'] === estados.estadoExamen.aprobadoCoordinador
+            ){
+            return models.ProgramacionDocente.update(
+                { estadoProGDoc: estados.estadoProgDoc.listo }, /* set attributes' value */
+                { where: { identificador: progID } } /* where criteria */
+            ).then(()=>{
+              thenFunction  
+            })
+            }else{
+                thenFunction
+            }        
+    })
+}
+//se completa con lo que hay en el controller de abrirprogdoc_controller
+//TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
+exports.abrirProgDoc = function (req, res, next) {
+    let estadoProfesores = {};
+    let estadoTribunales = {};
+    let nuevaEntrada = {};
+    if(!res.locals.permisoDenegado){
+        res.locals.departamentosResponsables.forEach(function (element) {
+            estadoProfesores[element] = estados.estadoProfesor.abierto;
+            estadoTribunales[element] = estados.estadoProfesor.abierto;
+        })
+        nuevaEntrada.estadoProfesores = estadoProfesores;
+        nuevaEntrada.fechaProfesores = new Date();
+        nuevaEntrada.estadoTribunales = estadoTribunales;
+        nuevaEntrada.fechaTribunales = new Date();
+        nuevaEntrada.estadoHorarios = estados.estadoHorario.abierto;
+        nuevaEntrada.fechaHorarios = new Date();
+        nuevaEntrada.estadoProGDoc = estados.estadoProgDoc.abierto;
+        nuevaEntrada.fechaGrupos = new Date();
+        nuevaEntrada.estadoExamenes = estados.estadoExamen.abierto;
+        nuevaEntrada.fechaExamenes = new Date();
+        nuevaEntrada.estadoCalendario = estados.estadoCalendario.abierto;
+        nuevaEntrada.fechaCalendario = new Date();
+        
+        return models.ProgramacionDocente.update(
+            nuevaEntrada, /* set attributes' value */
+            { where: { identificador: res.locals.identificador } } /* where criteria */
+        ).then(() => {
+
+            res.redirect("" + req.baseUrl + "/AbrirCerrar")
+        })
+    }else{
+        res.redirect("" + req.baseUrl + "/AbrirCerrar")
+    }
+
+}
+
+exports.cerrarProgDoc = function (req, res, next){
+    if (!res.locals.permisoDenegado){
+        let pdID = req.body.pdIdentificador.split("-")[1];
+        models.ProgramacionDocente.findOne(
+        { where: { identificador: pdID } } /* where criteria */
+        ).then((pd) => {
+            res.locals.progDoc = pd
+            next()
+        })
+    }else{
+        res.redirect("" + req.baseUrl + "/AbrirCerrar")
+    }
+    
+}
+//TODO a medida que aparezcan mas funciones hay que inicializar sus estados aquí
+exports.abrirIncidenciaProgDoc = function (req, res, next) {
+    if (!res.locals.permisoDenegado){
+        let estadoProfesores = {};
+        let estadoTribunales = {};
+        let nuevaEntrada = {};
+        res.locals.departamentosResponsables.forEach(function (element) {
+            estadoProfesores[element] = estados.estadoProfesor.aprobadoDirector;
+            estadoTribunales[element] = estados.estadoProfesor.aprobadoDirector;
+        })
+        nuevaEntrada.estadoProfesores = estadoProfesores;
+        nuevaEntrada.estadoTribunales = estadoTribunales;
+        nuevaEntrada.estadoHorarios = estados.estadoHorario.aprobadoCoordinador;
+        nuevaEntrada.estadoExamenes = estados.estadoExamen.aprobadoCoordinador;
+        nuevaEntrada.estadoProGDoc = estados.estadoProgDoc.incidencia;
+        return models.ProgramacionDocente.update(
+            nuevaEntrada, /* set attributes' value */
+            { where: { identificador: res.locals.identificador } } /* where criteria */
+        ).then(() => {
+
+            res.redirect("" + req.baseUrl + "/AbrirCerrar")
+        })
+    }else{
+        res.redirect("" + req.baseUrl + "/AbrirCerrar")
+    }
+    
+}
+exports.cerrarIncidenciaProgDoc = function (req, res, next) {
+    if (!res.locals.permisoDenegado) {
+        let pdID = req.body.pdIdentificador.split("-")[1];
+        models.ProgramacionDocente.findOne(
+            { where: { identificador: pdID } } /* where criteria */
+        ).then((pd) => {
+            res.locals.progDoc = pd
+            next()
+        })
+    } else {
+        res.redirect("" + req.baseUrl + "/AbrirCerrar")
+    }
+   
+}
+//TODO en el futuro la url será la del servidor donde lo almacene
+exports.cerrarProgDoc2 = function (req, res, next) {
+    let pdID = res.locals.progDoc['identificador']
+        models.ProgramacionDocente.update(
+            { estadoProGDoc: estados.estadoProgDoc.cerrado,
+              HistorialID : "url_"+pdID }, /* set attributes' value */
+            { where: { identificador: pdID } } /* where criteria */
+        ).then(() => {
+            res.redirect("" + req.baseUrl + "/AbrirCerrar")
+        })
+
+
+}
+
+function CumpleTodos(estado,objeto){
+    for (variable in objeto) {
+        if (objeto[variable] !== estado) {
+            return false;
+        }
+    }
+    return true;
 }

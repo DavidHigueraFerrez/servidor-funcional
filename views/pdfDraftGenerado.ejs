@@ -1,0 +1,7 @@
+<%- include consultar.ejs %>
+<% if (locals.estado && locals.estado !== null) { %>
+  <p><%=estado%></p>
+<%}else{%>
+    <embed src="../pdfs/<%=file%>" width="100%" height="600px" />
+<% } %> 
+
